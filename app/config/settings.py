@@ -13,3 +13,6 @@ DB_HOST = getenv("DB_HOST")
 
 DB_NAME = getenv("DB_NAME")
 
+DB_ENGINE = "postgresql"
+
+DB_PORT = "5432"
