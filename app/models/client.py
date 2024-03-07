@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Mapped, mapped_column, validates, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Date, DateTime, ForeignKey
 from datetime import date, datetime
 from .base import Base
