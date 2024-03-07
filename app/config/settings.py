@@ -1,5 +1,8 @@
 from passlib.context import CryptContext
 from os import getenv
+from dotenv import load_dotenv
+
+load_dotenv()
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
@@ -13,7 +16,6 @@ DB_HOST = getenv("DB_HOST")
 
 DB_NAME = getenv("DB_NAME")
 
-# Variable d'env pour tout
-DB_ENGINE = "postgresql"
+DB_ENGINE = getenv("DB_ENGINE")
 
-DB_PORT = "5432"
+DB_PORT = getenv("DB_PORT")
