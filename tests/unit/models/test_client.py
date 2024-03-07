@@ -2,6 +2,7 @@ import pytest
 from app.models import Base, Client
 from datetime import date, datetime
 
+
 def test_client_attributes(session):
     client = Client(
         full_name="Test Client",
@@ -9,7 +10,7 @@ def test_client_attributes(session):
         phone="+33695454332",
         address="123 Test St",
         company_name="Test Company",
-        sales_contact_id=1
+        sales_contact_id=1,
     )
     session.add(client)
     session.commit()
@@ -22,7 +23,6 @@ def test_client_attributes(session):
     assert client.sales_contact_id == 1
     assert isinstance(client.creation_date, date)
     assert isinstance(client.last_update, datetime)
-    
 
 
 def test_client_invalid_phone_number(session):
@@ -33,9 +33,10 @@ def test_client_invalid_phone_number(session):
             phone="+3369545",
             address="123 Test St",
             company_name="Test Company",
-            sales_contact_id=1
+            sales_contact_id=1,
         )
-    
+
+
 def test_client_invalid_email(session):
     with pytest.raises(ValueError, match="The domain name s.com does not exist."):
         client = Client(
@@ -44,5 +45,5 @@ def test_client_invalid_email(session):
             phone="+33695452233",
             address="123 Test St",
             company_name="Test Company",
-            sales_contact_id=1
+            sales_contact_id=1,
         )
