@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from .settings import DB_USER, DB_PASSWORD, DB_HOST, DB_NAME, DB_ENGINE, DB_PORT
+from settings import DATABASE
 
-DATABASE_URL = f"{DB_ENGINE}://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+DATABASE_URL = f"{DATABASE['DB_ENGINE']}://{DATABASE['DB_USER']}:{DATABASE['DB_PASSWORD']}@{DATABASE['DB_HOST']}:{DATABASE['DB_PORT']}/{DATABASE['DB_NAME']}"
 
 engine = create_engine(DATABASE_URL)
 
