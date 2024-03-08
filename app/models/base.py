@@ -2,6 +2,7 @@ from sqlalchemy.orm import DeclarativeBase, validates
 from email_validator import validate_email, EmailNotValidError
 from phonenumbers import parse, is_valid_number, phonenumberutil
 from app.config.settings import PHONE_REGION
+from app.config.database import Session
 
 
 class Base(DeclarativeBase):
@@ -22,3 +23,17 @@ class Base(DeclarativeBase):
         except phonenumberutil.NumberParseException as e:
             raise ValueError(str(e))
         return phone
+
+    def save(self):
+        session = Session()
+        session.add(self)
+        session.commit()
+
+    @classmethod
+    def get_instance(cls, id: int = None, **kwargs):
+        session = Session()
+        if id:
+            return session.query(cls).get(id)
+        if kwargs:
+            return session.query(cls).filter_by(**kwargs).first()
+        return None

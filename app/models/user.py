@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, ForeignKey
-from app.config.settings import pwd_context
+from datetime import datetime, timedelta
+from jwt import encode, decode, ExpiredSignatureError
+from app.config.settings import pwd_context, JWT
 from .base import Base
 
 
@@ -27,3 +29,16 @@ class User(Base):
 
     def verify_password(self, plain_text_passwd):
         return pwd_context.verify(plain_text_passwd, self._password)
+    
+    def generate_jwt_token(self):
+        exp = datetime.utcnow() + timedelta(hours=JWT["TOKEN_LIFETIME"])
+        token = encode({'id': self.id, 'exp': exp}, JWT["SECRET"], algorithm=JWT["ALGORITHM"])
+        return token
+
+    @staticmethod
+    def verify_jwt_token(token):
+        try:
+            payload = decode(token, JWT["SECRET"], algorithms=[JWT["ALGORITHM"]])
+            return payload['id']
+        except ExpiredSignatureError:
+            return None
