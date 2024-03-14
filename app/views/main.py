@@ -14,7 +14,9 @@ def login(email: str, password: str = None):
         password = typer.prompt("Enter your password", hide_input=True)
     login = AuthController.login(email, password)
     if login["valid"]:
-        AuthController.set_token()
+        if not AuthController.set_token():
+            typer.echo("Error: failed to save token.")
+            raise typer.Exit(1)
         typer.echo("Login successful.")
     else:
         typer.echo("Invalid credentials, please try again.")
