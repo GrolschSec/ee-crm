@@ -1,5 +1,6 @@
 from app.models import User
 from os import path
+from email_validator import validate_email, EmailNotValidError
 
 
 class AuthController:
@@ -45,13 +46,45 @@ class AuthController:
     @classmethod
     def is_authenticated(cls):
         if not cls.check_path():
-            return False
+            return [False, None]
         cls.try_open_token_file()
         if cls.token is None:
-            return False
+            return [False, None]
         cls.user_id = User.verify_jwt_token(cls.token)
         if cls.user_id is None:
+            return [False, None]
+        user = cls.try_get_user(id=cls.user_id)
+        if user is None:
+            return [False, None]
+        return [True, user]
+
+class PermissionsController:
+
+    @staticmethod
+    def is_admin(user: User):
+        return user.role.name == "admin"
+
+    @staticmethod
+    def is_sales_user(user: User):
+        return user.role.name == "sales"
+
+    @staticmethod
+    def is_support_user(user: User):
+        return user.role.name == "support"
+
+    @staticmethod
+    def is_management_user(user: User):
+        return user.role.name == "management"
+    
+class UserController:
+
+    @classmethod
+    def is_email_valid(email: str):
+        try:
+            validate_email(email)
+            return True
+        except EmailNotValidError:
             return False
-        if cls.try_get_user(id=cls.user_id) is None:
-            return False
-        return True
+    
+    
+    
