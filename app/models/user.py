@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from jwt import encode, decode, ExpiredSignatureError, DecodeError
 from app.config.settings import pwd_context, JWT
 from .base import Base
+from app.config.database import Session
 
 
 class User(Base):
@@ -46,3 +47,8 @@ class User(Base):
             return None
         except DecodeError:
             return None
+    
+    @classmethod
+    def get_first_by_role(cls, **kwargs):
+        session = Session()
+        return session.query(User).filter(User.role.has(**kwargs)).first()

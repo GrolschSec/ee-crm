@@ -37,3 +37,8 @@ class Base(DeclarativeBase):
         if kwargs:
             return session.query(cls).filter_by(**kwargs).first()
         return None
+
+    @classmethod
+    def filter_by(cls, **kwargs):
+        session = Session()
+        return session.query(cls).filter_by(**kwargs)
