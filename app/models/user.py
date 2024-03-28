@@ -47,7 +47,7 @@ class User(Base):
             return None
         except DecodeError:
             return None
-    
+
     @classmethod
     def get_first_by_role(cls, **kwargs):
         session = Session()

@@ -10,7 +10,7 @@ class AuthController:
         self.user_id = None
 
     @staticmethod
-    def fetch_user_by_email(email):
+    def fetch_user_by_email(email: str):
         try:
             return User.get_instance(email=email)
         except Exception:

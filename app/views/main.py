@@ -36,19 +36,3 @@ def useradd(admin: bool = False):
         else:
             echo("You do not have permission to create a user.")
             raise Exit(1)
-
-
-# @app.command()
-# def test():
-#     user = check_authentication()
-#     typer.echo("You are authenticated.")
-#     if PermissionsController.is_admin(user):
-#         typer.echo("You are an admin.")
-#     elif PermissionsController.is_sales_user(user):
-#         typer.echo("You are a sales user.")
-#     elif PermissionsController.is_support_user(user):
-#         typer.echo("You are a support user.")
-#     elif PermissionsController.is_management_user(user):
-#         typer.echo("You are a management user.")
-#     else:
-#         typer.echo("You are an unknown user.")
