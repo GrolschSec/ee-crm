@@ -1,5 +1,5 @@
 from app.models import User
-from os import path
+from os import path, unlink
 
 
 class AuthController:
@@ -57,3 +57,14 @@ class AuthController:
         cls.user_id = User.verify_jwt_token(cls.token)
         user = User.get_instance(id=cls.user_id)
         return [user is not None, user]
+
+    @classmethod
+    def delete_token_file(cls):
+        try:
+            if cls.is_token_file_present():
+                unlink(cls.TOKEN_PATH)
+                return [True, None]
+            else:
+                return [False, "Token file not found."]
+        except PermissionError:
+            return [False, "Permission denied."]

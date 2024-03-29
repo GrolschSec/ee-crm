@@ -36,3 +36,11 @@ def useradd(admin: bool = False):
         else:
             echo("You do not have permission to create a user.")
             raise Exit(1)
+
+@app.command()
+def logout():
+    res = AuthController.delete_token_file()
+    if not res[0]:
+        echo(f"Error: {res[1]}")
+        raise Exit(1)
+    echo("Logout successful.")
