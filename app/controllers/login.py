@@ -35,13 +35,3 @@ class LoginController:
             return True
         except PermissionError:
             return False
-
-    # def delete_token_file(self):
-    #     try:
-    #         if self.is_token_file_present():
-    #             unlink(self.TOKEN_PATH)
-    #             return [True, None]
-    #         else:
-    #             return [False, "Token file not found."]
-    #     except PermissionError:
-    #         return [False, "Permission denied."]
