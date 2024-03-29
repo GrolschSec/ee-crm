@@ -2,7 +2,7 @@ from app.views.view import View
 from app.controllers.permission import (
     isAuthenticated,
     AllowAny,
-    isAdminOrisManagementTeam
+    isAdminOrisManagementTeam,
 )
 from app.controllers.user import UserController
 from typer import prompt, echo, Exit
@@ -19,7 +19,12 @@ class UserAddView(View):
         self.password = self.get_password()
         self.role = self.get_role()
 
-        user = {"fullname": self.fullname, "email": self.email, "password": self.password, "role": self.role}
+        user = {
+            "fullname": self.fullname,
+            "email": self.email,
+            "password": self.password,
+            "role": self.role,
+        }
         if UserController.create_user(user):
             echo("User created successfully.")
 
@@ -30,7 +35,7 @@ class UserAddView(View):
             if res[0]:
                 return fullname
             echo(f"Error: {res[1]}")
-    
+
     def get_email(self):
         while True:
             email = prompt("Enter email")
@@ -41,7 +46,7 @@ class UserAddView(View):
                 echo("Error: user with that email already exists.")
                 continue
             return email
-    
+
     def get_password(self):
         while True:
             password = prompt("Enter password", hide_input=True)
@@ -61,6 +66,7 @@ class UserAddView(View):
                 return res[1]
             echo(f"Error: {res[1]}")
 
+
 class UserAddAdminView(UserAddView):
     permission_classes = [AllowAny]
 
@@ -72,6 +78,7 @@ class UserAddAdminView(UserAddView):
             echo("Admin user already exists.")
             raise Exit(1)
         super().handle()
+
 
 class UserAddUserView(UserAddView):
     permission_classes = [isAuthenticated, isAdminOrisManagementTeam]

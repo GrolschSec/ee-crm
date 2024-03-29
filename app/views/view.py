@@ -1,6 +1,7 @@
 from app.controllers.permission import isAuthenticated, AllowAny
 from typer import echo
 
+
 class View:
     permission_classes = []
 

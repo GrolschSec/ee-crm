@@ -1,5 +1,6 @@
 from typer import Typer
 from app.views.login import LoginView
+from app.views.logout import LogoutView
 from app.views.useradd import UserAddAdminView, UserAddUserView
 
 app = Typer()
@@ -19,13 +20,10 @@ def useradd(admin: bool = False):
         UserAddUserView().dispatch()
 
 
-# @app.command()
-# def logout():
-#     res = AuthController.delete_token_file()
-#     if not res[0]:
-#         echo(f"Error: {res[1]}")
-#         raise Exit(1)
-#     echo("Logout successful.")
+@app.command()
+def logout():
+    view = LogoutView()
+    view.dispatch()
 
 
 @app.command()
