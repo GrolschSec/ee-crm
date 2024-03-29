@@ -20,9 +20,9 @@ class UserView(CRUDView):
 
     def create(self, admin: bool = False):
         if admin:
-            UserAddAdminView().create()
+            UserAddAdminView().handle_create()
         else:
-            UserAddUserView().create()
+            UserAddUserView().handle_create()
 
     def user_creation(self):
         self.fullname = self.get_fullname()
@@ -83,7 +83,7 @@ class UserAddAdminView(UserView):
     def __init__(self) -> None:
         self.admin = True
 
-    def create(self):
+    def create(self, **kwargs):
         if UserController.admin_exist():
             echo("Error: Admin already exists.")
             raise Exit(1)
@@ -96,5 +96,5 @@ class UserAddUserView(UserView):
     def __init__(self) -> None:
         self.admin = False
 
-    def create(self):
+    def create(self, **kwargs):
         return self.user_creation()

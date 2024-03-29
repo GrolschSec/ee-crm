@@ -1,9 +1,8 @@
-from sqlalchemy.orm import DeclarativeBase, validates
+from sqlalchemy.orm import DeclarativeBase, validates, joinedload
 from email_validator import validate_email, EmailNotValidError
 from phonenumbers import parse, is_valid_number, phonenumberutil
 from app.config.settings import PHONE_REGION
 from app.config.database import Session
-
 
 class Base(DeclarativeBase):
     @validates("email")
@@ -33,9 +32,9 @@ class Base(DeclarativeBase):
     def get_instance(cls, id: int = None, **kwargs):
         session = Session()
         if id:
-            return session.query(cls).get(id)
+            return session.query(cls).options(joinedload('*')).get(id)
         if kwargs:
-            return session.query(cls).filter_by(**kwargs).first()
+            return session.query(cls).options(joinedload('*')).filter_by(**kwargs).first()
         return None
 
     @classmethod
