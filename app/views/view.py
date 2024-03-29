@@ -1,11 +1,12 @@
 from app.controllers.permission import isAuthenticated, AllowAny
 from typer import echo
+from typer import Typer
 
 
 class View:
     permission_classes = []
 
-    def dispatch(self, *args, **kwargs):
+    def dispatch(self, **kwargs):
         if isAuthenticated in self.permission_classes:
             auth = isAuthenticated()
             if not auth.has_permission():
@@ -14,7 +15,59 @@ class View:
         for permission in self.permission_classes:
             if not permission().has_permission(**kwargs):
                 return echo("Permission Denied")
-        return self.handle(*args, **kwargs)
+        return self.handle(**kwargs)
 
-    def handle(self, *args, **kwargs):
+    def handle(self, **kwargs):
         raise NotImplementedError
+
+
+class CRUDView(View):
+
+    def __init__(self) -> None:
+        self.app = Typer()
+
+    def handle_create(self, **kwargs):
+        self.dispatch(request="create", **kwargs)
+
+    def handle_read(self, **kwargs):
+        self.dispatch(request="read", **kwargs)
+
+    def handle_list(self, **kwargs):
+        self.dispatch(request="list", **kwargs)
+
+    def handle_update(self, **kwargs):
+        self.dispatch(request="update", **kwargs)
+
+    def handle_delete(self, **kwargs):
+        self.dispatch(request="delete", **kwargs)
+
+    def create(self, **kwargs):
+        raise NotImplementedError
+
+    def read(self, **kwargs):
+        raise NotImplementedError
+
+    def list(self, **kwargs):
+        raise NotImplementedError
+
+    def update(self, **kwargs):
+        raise NotImplementedError
+
+    def delete(self, **kwargs):
+        raise NotImplementedError
+
+    def handle(self, **kwargs):
+        request = kwargs.get("request")
+        kwargs.pop("request")
+        if request == "create":
+            return self.create(**kwargs)
+        elif request == "read":
+            return self.read(**kwargs)
+        elif request == "list":
+            return self.list(**kwargs)
+        elif request == "update":
+            return self.update(**kwargs)
+        elif request == "delete":
+            return self.delete(**kwargs)
+        else:
+            raise NotImplementedError

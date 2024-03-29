@@ -84,3 +84,10 @@ class isAdminOrisManagementTeam(Permission):
         return isAdmin().has_permission(**kwargs) or isManagementTeam().has_permission(
             **kwargs
         )
+
+
+class CreateIsAdminOrManagement(isAdminOrisManagementTeam):
+    def has_permission(self, **kwargs):
+        if kwargs.get("request") == "create":
+            return super().has_permission(**kwargs)
+        return True

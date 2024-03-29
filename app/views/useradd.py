@@ -1,24 +1,34 @@
-from app.views.view import View
-from app.controllers.permission import (
-    isAuthenticated,
-    AllowAny,
-    isAdminOrisManagementTeam,
-)
+from app.views.view import CRUDView
 from app.controllers.user import UserController
-from typer import prompt, echo, Exit
+from typer import echo, prompt, Exit
+from app.controllers.permission import (
+    AllowAny,
+    isAuthenticated,
+    CreateIsAdminOrManagement,
+)
 
 
-class UserAddView(View):
+class UserView(CRUDView):
+    permission_classes = [AllowAny]
 
-    def __init__(self, admin: bool = False):
-        self.admin = admin
+    def __init__(self) -> None:
+        super().__init__()
+        self.app.command("create")(self.handle_create)
 
-    def handle(self, *args, **kwargs):
+    def handle_create(self, admin: bool = False):
+        return super().handle_create(admin=admin)
+
+    def create(self, admin: bool = False):
+        if admin:
+            UserAddAdminView().create()
+        else:
+            UserAddUserView().create()
+
+    def user_creation(self):
         self.fullname = self.get_fullname()
         self.email = self.get_email()
         self.password = self.get_password()
         self.role = self.get_role()
-
         user = {
             "fullname": self.fullname,
             "email": self.email,
@@ -67,18 +77,24 @@ class UserAddView(View):
             echo(f"Error: {res[1]}")
 
 
-class UserAddAdminView(UserAddView):
+class UserAddAdminView(UserView):
     permission_classes = [AllowAny]
 
-    def __init__(self):
-        super().__init__(admin=True)
+    def __init__(self) -> None:
+        self.admin = True
 
-    def handle(self, *args, **kwargs):
+    def create(self):
         if UserController.admin_exist():
-            echo("Admin user already exists.")
+            echo("Error: Admin already exists.")
             raise Exit(1)
-        super().handle()
+        return self.user_creation()
 
 
-class UserAddUserView(UserAddView):
-    permission_classes = [isAuthenticated, isAdminOrisManagementTeam]
+class UserAddUserView(UserView):
+    permission_classes = [isAuthenticated, CreateIsAdminOrManagement]
+
+    def __init__(self) -> None:
+        self.admin = False
+
+    def create(self):
+        return self.user_creation()

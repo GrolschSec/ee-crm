@@ -1,7 +1,7 @@
 from typer import Typer
 from app.views.login import LoginView
 from app.views.logout import LogoutView
-from app.views.useradd import UserAddAdminView, UserAddUserView
+from app.views.useradd import UserView
 
 app = Typer()
 
@@ -13,14 +13,9 @@ def login(email: str, password: str = None):
 
 
 @app.command()
-def useradd(admin: bool = False):
-    if admin:
-        UserAddAdminView().dispatch()
-    else:
-        UserAddUserView().dispatch()
-
-
-@app.command()
 def logout():
     view = LogoutView()
     view.dispatch()
+
+
+app.add_typer(UserView().app, name="user")

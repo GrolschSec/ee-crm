@@ -1,5 +1,6 @@
 from os import unlink, path
 
+
 class LogoutController:
     TOKEN_PATH = path.join(path.expanduser("~"), ".ee_token")
 
