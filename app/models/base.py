@@ -4,6 +4,7 @@ from phonenumbers import parse, is_valid_number, phonenumberutil
 from app.config.settings import PHONE_REGION
 from app.config.database import Session
 
+
 class Base(DeclarativeBase):
     @validates("email")
     def validate_email(self, key, email):
@@ -32,9 +33,11 @@ class Base(DeclarativeBase):
     def get_instance(cls, id: int = None, **kwargs):
         session = Session()
         if id:
-            return session.query(cls).options(joinedload('*')).get(id)
+            return session.query(cls).options(joinedload("*")).get(id)
         if kwargs:
-            return session.query(cls).options(joinedload('*')).filter_by(**kwargs).first()
+            return (
+                session.query(cls).options(joinedload("*")).filter_by(**kwargs).first()
+            )
         return None
 
     @classmethod
