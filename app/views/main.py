@@ -1,7 +1,7 @@
 from typer import Typer
 from app.views.login import LoginView
 from app.views.logout import LogoutView
-from app.views.useradd import UserView
+from app.views.user import UserView
 
 app = Typer()
 
