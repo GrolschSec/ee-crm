@@ -1,24 +1,14 @@
 from typer import Typer, prompt, echo, Exit
-from app.controllers.authentication import AuthController
 from app.controllers.user import UserController
-from app.views.utils import user_creation, check_authentication
+from app.views.login import LoginView
 
 app = Typer()
 
 
 @app.command()
 def login(email: str, password: str = None):
-    if password is None:
-        password = prompt("Enter your password", hide_input=True)
-    login = AuthController.login(email, password)
-    if login["valid"]:
-        if not AuthController.write_token_to_file():
-            echo("Error: failed to save token.")
-            raise Exit(1)
-        echo("Login successful.")
-    else:
-        echo("Invalid credentials, please try again.")
-        raise Exit(1)
+    view = LoginView()
+    view.dispatch(email=email, password=password)
 
 
 @app.command()
@@ -37,10 +27,17 @@ def useradd(admin: bool = False):
             echo("You do not have permission to create a user.")
             raise Exit(1)
 
+
+# @app.command()
+# def logout():
+#     res = AuthController.delete_token_file()
+#     if not res[0]:
+#         echo(f"Error: {res[1]}")
+#         raise Exit(1)
+#     echo("Logout successful.")
+
+
 @app.command()
-def logout():
-    res = AuthController.delete_token_file()
-    if not res[0]:
-        echo(f"Error: {res[1]}")
-        raise Exit(1)
-    echo("Logout successful.")
+def test():
+    view = LoginView()
+    view.dispatch()
