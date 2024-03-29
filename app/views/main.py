@@ -24,9 +24,3 @@ def useradd(admin: bool = False):
 def logout():
     view = LogoutView()
     view.dispatch()
-
-
-@app.command()
-def test():
-    view = LoginView()
-    view.dispatch()
