@@ -61,20 +61,17 @@ class UserAddView(View):
                 return res[1]
             echo(f"Error: {res[1]}")
 
-class UserAddAdminView(View):
+class UserAddAdminView(UserAddView):
     permission_classes = [AllowAny]
+
+    def __init__(self):
+        super().__init__(admin=True)
 
     def handle(self, *args, **kwargs):
         if UserController.admin_exist():
             echo("Admin user already exists.")
             raise Exit(1)
-        view = UserAddView(admin=True)
-        view.dispatch()
+        super().handle()
 
-
-class UserAddUserView(View):
+class UserAddUserView(UserAddView):
     permission_classes = [isAuthenticated, isAdminOrisManagementTeam]
-
-    def handle(self, *args, **kwargs):
-        view = UserAddView()
-        view.dispatch()
