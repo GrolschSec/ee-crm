@@ -4,12 +4,12 @@ from email_validator import validate_email, EmailNotValidError
 
 class UserController:
 
-    @classmethod
-    def admin_exist(cls):
+    @staticmethod
+    def admin_exist():
         return User.get_first_by_role(name="admin") is not None
 
-    @classmethod
-    def user_exist(cls, email):
+    @staticmethod
+    def user_exist(email):
         if User.get_instance(email=email) is not None:
             return True
         return False

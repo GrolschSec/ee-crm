@@ -1,5 +1,6 @@
 from app.models import User
 from os import path
+from typer import echo
 
 
 class Permission:
@@ -19,13 +20,12 @@ class isAuthenticated(Permission):
     def is_token_file_present(cls):
         return path.exists(cls.TOKEN_PATH)
 
-    @classmethod
-    def read_token_from_file(cls):
+    def read_token_from_file(self):
         try:
-            with open(cls.TOKEN_PATH, "r") as f:
-                cls.token = f.read()
+            with open(self.TOKEN_PATH, "r") as f:
+                self.token = f.read()
         except PermissionError:
-            cls.token = None
+            self.token = None
 
     def has_permission(self, **kwargs):
         if not self.is_token_file_present():
@@ -50,30 +50,37 @@ class isAdmin(UserBasedPermission):
     def has_permission(self, **kwargs):
         if not super().has_permission(**kwargs):
             return False
-        return kwargs.get("user").role == "admin"
+        return kwargs.get("user").role.name == "admin"
 
 
 class isManagementTeam(UserBasedPermission):
     def has_permission(self, **kwargs):
         if not super().has_permission(**kwargs):
             return False
-        return kwargs.get("user").role == "management"
+        return kwargs.get("user").role.name == "management"
 
 
 class isSalesTeam(UserBasedPermission):
     def has_permission(self, **kwargs):
         if not super().has_permission(**kwargs):
             return False
-        return kwargs.get("user").role == "sales"
+        return kwargs.get("user").role.name == "sales"
 
 
 class isSupportTeam(UserBasedPermission):
     def has_permission(self, **kwargs):
         if not super().has_permission(**kwargs):
             return False
-        return kwargs.get("user").role == "support"
+        return kwargs.get("user").role.name == "support"
 
 
 class AllowAny(Permission):
     def has_permission(self, **kwargs):
         return True
+
+
+class isAdminOrisManagementTeam(Permission):
+    def has_permission(self, **kwargs):
+        return isAdmin().has_permission(**kwargs) or isManagementTeam().has_permission(
+            **kwargs
+        )

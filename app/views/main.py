@@ -1,6 +1,6 @@
-from typer import Typer, prompt, echo, Exit
-from app.controllers.user import UserController
+from typer import Typer
 from app.views.login import LoginView
+from app.views.useradd import UserAddAdminView, UserAddUserView
 
 app = Typer()
 
@@ -14,18 +14,9 @@ def login(email: str, password: str = None):
 @app.command()
 def useradd(admin: bool = False):
     if admin:
-        if UserController.admin_exist():
-            echo("Admin user already exists.")
-            raise Exit(1)
-        user_creation(admin=True)
+        UserAddAdminView().dispatch()
     else:
-        user = check_authentication()
-        role = user.role.name
-        if role == "admin" or role == "management":
-            user_creation()
-        else:
-            echo("You do not have permission to create a user.")
-            raise Exit(1)
+        UserAddUserView().dispatch()
 
 
 # @app.command()
