@@ -37,7 +37,9 @@ class Base(DeclarativeBase):
         if id:
             query_res = session.query(cls).options(joinedload("*")).get(id)
         if kwargs:
-            query_res = session.query(cls).options(joinedload("*")).filter_by(**kwargs).first()
+            query_res = (
+                session.query(cls).options(joinedload("*")).filter_by(**kwargs).first()
+            )
         session.close()
         return query_res
 
@@ -45,5 +47,12 @@ class Base(DeclarativeBase):
     def filter_by(cls, **kwargs):
         session = Session()
         query_res = session.query(cls).filter_by(**kwargs)
+        session.close()
+        return query_res
+
+    @classmethod
+    def all(cls):
+        session = Session()
+        query_res = session.query(cls).all()
         session.close()
         return query_res

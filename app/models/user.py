@@ -6,7 +6,7 @@ from passlib.exc import UnknownHashError
 from app.config.settings import pwd_context, JWT
 from .base import Base
 from app.config.database import Session
-from typer import Exit, echo
+from sqlalchemy.orm import joinedload
 
 
 class User(Base):
@@ -57,3 +57,10 @@ class User(Base):
     def get_first_by_role(cls, **kwargs):
         session = Session()
         return session.query(User).filter(User.role.has(**kwargs)).first()
+
+    @classmethod
+    def all(cls):
+        session = Session()
+        query_res = session.query(cls).options(joinedload(cls.role)).all()
+        session.close()
+        return query_res

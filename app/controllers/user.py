@@ -65,7 +65,7 @@ class UserController:
         )
         user.save()
         return True
-    
+
     @staticmethod
     def update_user(**kwargs):
         updated = False
@@ -86,7 +86,7 @@ class UserController:
         if updated:
             user.save()
         return updated
-    
+
     @staticmethod
     def anonymize(**kwargs):
         user = User.get_instance(id=kwargs.get("user_id"))
@@ -99,3 +99,7 @@ class UserController:
     @staticmethod
     def get_user(**kwargs):
         return User.get_instance(**kwargs)
+
+    @staticmethod
+    def get_all_users():
+        return User.all()

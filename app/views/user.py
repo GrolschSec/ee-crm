@@ -1,11 +1,12 @@
 from app.views.view import CRUDView
 from app.controllers.user import UserController
 from typer import echo, prompt, Exit, Option
+from tabulate import tabulate
 from app.controllers.permission import (
     AllowAny,
     isAuthenticated,
     CreateIsAdminOrManagement,
-    isAdminOrisManagementTeam
+    isAdminOrisManagementTeam,
 )
 
 
@@ -14,7 +15,7 @@ class UserView(CRUDView):
         "create": [AllowAny],
         "list": [isAuthenticated, isAdminOrisManagementTeam],
         "update": [isAuthenticated, isAdminOrisManagementTeam],
-        "delete": [isAuthenticated, isAdminOrisManagementTeam]
+        "delete": [isAuthenticated, isAdminOrisManagementTeam],
     }
 
     def __init__(self) -> None:
@@ -32,29 +33,61 @@ class UserView(CRUDView):
             UserAddAdminView().handle_create()
         else:
             UserAddUserView().handle_create()
-    
+
     def handle_list(self):
         return super().handle_list()
 
     def list(self, **kwargs):
-        echo("List users")
-    
-    def handle_update(self, user_id: int, fullname: str = None, email: str = None, role: str = None, password: str = None):
-        return super().handle_update(user_id=user_id, fullname=fullname, email=email, role=role, password=password)
+        users = UserController.get_all_users()
+        table = [(user.id, user.fullname, user.email, user.role.name) for user in users]
+        echo(
+            tabulate(
+                table, headers=["ID", "Fullname", "Email", "Role"], tablefmt="pretty"
+            )
+        )
+
+    def handle_update(
+        self,
+        user_id: int,
+        fullname: str = None,
+        email: str = None,
+        role: str = None,
+        password: str = None,
+    ):
+        return super().handle_update(
+            user_id=user_id,
+            fullname=fullname,
+            email=email,
+            role=role,
+            password=password,
+        )
 
     def update(self, **kwargs):
         self.user_exist(**kwargs)
-        if kwargs.get("fullname") and not UserController.validate_fullname(kwargs.get("fullname"))[0]:
+        if (
+            kwargs.get("fullname")
+            and not UserController.validate_fullname(kwargs.get("fullname"))[0]
+        ):
             echo("Error: Invalid fullname.")
             raise Exit(1)
-        if kwargs.get("email") and not UserController.validate_email(kwargs.get("email")):
+        if kwargs.get("email") and not UserController.validate_email(
+            kwargs.get("email")
+        ):
             echo("Error: Invalid email.")
             raise Exit(1)
-        if kwargs.get("role") and not UserController.validate_role(kwargs.get("role"))[0]:
+        if (
+            kwargs.get("role")
+            and not UserController.validate_role(kwargs.get("role"))[0]
+        ):
             echo("Error: Invalid role. Roles: management, sales, support.")
             raise Exit(1)
-        if kwargs.get("password") and not UserController.validate_password(kwargs.get("password"))[0]:
-            echo(f"Error: {UserController.validate_password(kwargs.get('password'))[1]}")
+        if (
+            kwargs.get("password")
+            and not UserController.validate_password(kwargs.get("password"))[0]
+        ):
+            echo(
+                f"Error: {UserController.validate_password(kwargs.get('password'))[1]}"
+            )
             raise Exit(1)
         if UserController.update_user(**kwargs):
             echo("User updated successfully.")
@@ -63,7 +96,7 @@ class UserView(CRUDView):
 
     def handle_delete(self, user_id: int):
         return super().handle_delete(user_id=user_id)
-    
+
     def delete(self, **kwargs):
         self.user_exist(**kwargs)
         user = UserController.get_user(id=kwargs.get("user_id"))
@@ -73,7 +106,6 @@ class UserView(CRUDView):
             echo("User deleted successfully.")
         else:
             echo("Operation cancelled.")
-
 
     def user_exist(self, **kwargs):
         if not UserController.user_exist(id=kwargs.get("user_id")):
