@@ -9,8 +9,8 @@ class UserController:
         return User.get_first_by_role(name="admin") is not None
 
     @staticmethod
-    def user_exist(email):
-        if User.get_instance(email=email) is not None:
+    def user_exist(**kwargs):
+        if User.get_instance(**kwargs) is not None:
             return True
         return False
 
@@ -65,3 +65,37 @@ class UserController:
         )
         user.save()
         return True
+    
+    @staticmethod
+    def update_user(**kwargs):
+        updated = False
+        user = User.get_instance(id=kwargs.get("user_id"))
+
+        if kwargs.get("fullname"):
+            user.fullname = kwargs.get("fullname")
+            updated = True
+        if kwargs.get("email"):
+            user.email = kwargs.get("email")
+            updated = True
+        if kwargs.get("role"):
+            user.role_id = Role.get_instance(name=kwargs.get("role")).id
+            updated = True
+        if kwargs.get("password"):
+            user.password = kwargs.get("password")
+            updated = True
+        if updated:
+            user.save()
+        return updated
+    
+    @staticmethod
+    def anonymize(**kwargs):
+        user = User.get_instance(id=kwargs.get("user_id"))
+        user.fullname = "Anonymous"
+        user.email = "anonymous@anonymous.com"
+        user._password = "Anonymous"
+        user.role_id = Role.get_instance(name="anonymous").id
+        user.save()
+
+    @staticmethod
+    def get_user(**kwargs):
+        return User.get_instance(**kwargs)

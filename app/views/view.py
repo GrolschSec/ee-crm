@@ -7,12 +7,17 @@ class View:
     permission_classes = []
 
     def dispatch(self, **kwargs):
-        if isAuthenticated in self.permission_classes:
+        permissions = self.permission_classes
+
+        if isinstance(permissions, dict):
+            permissions = permissions.get(kwargs.get("request"), [])
+
+        if isAuthenticated in permissions:
             auth = isAuthenticated()
             if not auth.has_permission():
                 return echo("Permission Denied")
             kwargs["user"] = auth.user
-        for permission in self.permission_classes:
+        for permission in permissions:
             if not permission().has_permission(**kwargs):
                 return echo("Permission Denied")
         return self.handle(**kwargs)

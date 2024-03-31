@@ -26,21 +26,24 @@ class Base(DeclarativeBase):
 
     def save(self):
         session = Session()
-        session.add(self)
+        session.merge(self)
         session.commit()
+        session.close()
 
     @classmethod
     def get_instance(cls, id: int = None, **kwargs):
+        query_res = None
         session = Session()
         if id:
-            return session.query(cls).options(joinedload("*")).get(id)
+            query_res = session.query(cls).options(joinedload("*")).get(id)
         if kwargs:
-            return (
-                session.query(cls).options(joinedload("*")).filter_by(**kwargs).first()
-            )
-        return None
+            query_res = session.query(cls).options(joinedload("*")).filter_by(**kwargs).first()
+        session.close()
+        return query_res
 
     @classmethod
     def filter_by(cls, **kwargs):
         session = Session()
-        return session.query(cls).filter_by(**kwargs)
+        query_res = session.query(cls).filter_by(**kwargs)
+        session.close()
+        return query_res
