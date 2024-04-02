@@ -1,4 +1,4 @@
-from app.controllers.permission import isAuthenticated, AllowAny
+from app.controllers.permission import isAuthenticated
 from typer import echo
 from typer import Typer
 

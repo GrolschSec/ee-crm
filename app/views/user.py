@@ -1,6 +1,6 @@
 from app.views.view import CRUDView
 from app.controllers.user import UserController
-from typer import echo, prompt, Exit, Option
+from typer import echo, prompt, Exit
 from tabulate import tabulate
 from app.controllers.permission import (
     AllowAny,
@@ -39,7 +39,11 @@ class UserView(CRUDView):
 
     def list(self, **kwargs):
         users = UserController.get_all_users()
-        table = [(user.id, user.fullname, user.email, user.role.name) for user in users]
+        table = [
+            (user.id, user.fullname, user.email, user.role.name)
+            for user in users
+            if user.role.name != "anonymous"
+        ]
         echo(
             tabulate(
                 table, headers=["ID", "Fullname", "Email", "Role"], tablefmt="pretty"

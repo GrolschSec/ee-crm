@@ -2,6 +2,7 @@ from typer import Typer
 from app.views.login import LoginView
 from app.views.logout import LogoutView
 from app.views.user import UserView
+from app.views.client import ClientView
 
 app = Typer()
 
@@ -19,3 +20,5 @@ def logout():
 
 
 app.add_typer(UserView().app, name="user")
+
+app.add_typer(ClientView().app, name="client")

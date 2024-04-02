@@ -22,3 +22,5 @@ JWT = {
     "ALGORITHM": getenv("JWT_ALGORITHM"),
     "TOKEN_LIFETIME": int(getenv("JWT_TOKEN_LIFETIME")),
 }
+
+TIMEZONE = getenv("TZ")

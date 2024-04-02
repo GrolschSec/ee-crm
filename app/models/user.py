@@ -3,10 +3,11 @@ from sqlalchemy import String, ForeignKey
 from datetime import datetime, timedelta
 from jwt import encode, decode, ExpiredSignatureError, DecodeError
 from passlib.exc import UnknownHashError
-from app.config.settings import pwd_context, JWT
+from app.config.settings import pwd_context, JWT, TIMEZONE
 from .base import Base
 from app.config.database import Session
 from sqlalchemy.orm import joinedload
+from pytz import timezone
 
 
 class User(Base):
@@ -37,7 +38,8 @@ class User(Base):
             return False
 
     def generate_jwt_token(self):
-        exp = datetime.utcnow() + timedelta(hours=JWT["TOKEN_LIFETIME"])
+        tz = timezone(TIMEZONE)
+        exp = datetime.now(tz) + timedelta(hours=JWT["TOKEN_LIFETIME"])
         token = encode(
             {"id": self.id, "exp": exp}, JWT["SECRET"], algorithm=JWT["ALGORITHM"]
         )
