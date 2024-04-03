@@ -1,6 +1,3 @@
-from app.models import User
-from os import path
-from typer import echo
 
 
 class Permission:
