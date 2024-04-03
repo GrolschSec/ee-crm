@@ -37,13 +37,14 @@ class View:
         kwargs["user"] = UserController.authenticate()
 
     def dispatch(self, **kwargs):
-
         self.perform_authentication(kwargs)
 
         if "pk" in kwargs:
             kwargs["obj"] = self.get_object(kwargs["pk"])
-        
-        if not self.check_permissions(**kwargs) or not self.check_obj_permissions(**kwargs):
+
+        if not self.check_permissions(**kwargs) or not self.check_obj_permissions(
+            **kwargs
+        ):
             echo("Permission denied.")
             raise Exit(1)
 
