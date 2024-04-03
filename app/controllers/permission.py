@@ -1,18 +1,18 @@
-
-
 class Permission:
     def has_permission(self, **kwargs):
         raise NotImplementedError
-    
+
     def has_obj_permission(self, obj, **kwargs):
         raise NotImplementedError
+
 
 class BasePermission(Permission):
     def has_permission(self, **kwargs):
         return True
-    
+
     def has_obj_permission(self, obj, **kwargs):
         return True
+
 
 class isAuthenticated(BasePermission):
     def has_permission(self, **kwargs):
@@ -53,6 +53,7 @@ class isSupportTeam(isAuthenticated):
 class AllowAny(BasePermission):
     def has_permission(self, **kwargs):
         return True
+
 
 class isSalesReferent(isSalesTeam):
     def has_obj_permission(self, obj, **kwargs):
