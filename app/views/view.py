@@ -1,4 +1,3 @@
-from app.controllers.permission import isAdmin
 from app.controllers.user import UserController
 from typer import Typer, Exit, echo
 
@@ -22,12 +21,20 @@ class View:
         return permissions
 
     def check_permissions(self, **kwargs):
+        user = kwargs.get("user")
+        if user and user.is_admin:
+            return True
+
         for permission in self.get_permission(**kwargs):
             if not permission().has_permission(**kwargs):
                 return False
         return True
 
     def check_obj_permissions(self, **kwargs):
+        user = kwargs.get("user")
+        if user and user.is_admin:
+            return True
+
         for permission in self.get_permission(**kwargs):
             if kwargs.get("obj") and not permission().has_obj_permission(**kwargs):
                 return False
