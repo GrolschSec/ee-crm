@@ -1,25 +1,52 @@
-from app.controllers.permission import isAuthenticated
-from typer import echo
-from typer import Typer
+from app.controllers.permission import isAdmin
+from app.controllers.user import UserController
+from typer import Typer, Exit, echo
 
 
 class View:
     permission_classes = []
 
-    def dispatch(self, **kwargs):
+    controller_class = None
+
+    def get_object(self, pk):
+        if self.controller_class is None:
+            return None
+        return self.controller_class.get_object(id=pk)
+
+    def get_permission(self, **kwargs):
         permissions = self.permission_classes
 
         if isinstance(permissions, dict):
             permissions = permissions.get(kwargs.get("request"), [])
 
-        if isAuthenticated in permissions:
-            auth = isAuthenticated()
-            if not auth.has_permission():
-                return echo("Permission Denied")
-            kwargs["user"] = auth.user
-        for permission in permissions:
+        return permissions
+
+    def check_permissions(self, **kwargs):
+        for permission in self.get_permission(**kwargs):
             if not permission().has_permission(**kwargs):
-                return echo("Permission Denied")
+                return False
+        return True
+
+    def check_obj_permissions(self, **kwargs):
+        for permission in self.get_permission(**kwargs):
+            if kwargs.get("obj") and not permission().has_obj_permission(**kwargs):
+                return False
+        return True
+
+    def perform_authentication(self, kwargs):
+        kwargs["user"] = UserController.authenticate()
+
+    def dispatch(self, **kwargs):
+
+        self.perform_authentication(kwargs)
+
+        if "pk" in kwargs:
+            kwargs["obj"] = self.get_object(kwargs["pk"])
+        
+        if not self.check_permissions(**kwargs) or not self.check_obj_permissions(**kwargs):
+            echo("Permission denied.")
+            raise Exit(1)
+
         return self.handle(**kwargs)
 
     def handle(self, **kwargs):
@@ -27,7 +54,6 @@ class View:
 
 
 class CRUDView(View):
-
     def __init__(self) -> None:
         self.app = Typer()
 
