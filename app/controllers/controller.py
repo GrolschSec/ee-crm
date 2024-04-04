@@ -73,4 +73,6 @@ class ModelController:
         return self.is_valid
 
     def save(self):
+        if not self.is_valid:
+            raise IntegrityError("Invalid data.")
         self.object.save()

@@ -49,7 +49,6 @@ class UserController(ModelController):
         if self.errors.get("role"):
             self.errors["role"] = ""
         role = role.lower()
-        print(role)
         if (
             role != "management"
             and role != "sales"
