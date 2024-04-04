@@ -50,7 +50,12 @@ class UserController(ModelController):
             self.errors["role"] = ""
         role = role.lower()
         print(role)
-        if role != "management" and role != "sales" and role != "support" and role != "admin":
+        if (
+            role != "management"
+            and role != "sales"
+            and role != "support"
+            and role != "admin"
+        ):
             self.errors["role"] = "Invalid role."
             return False
         self.values["role"] = role
