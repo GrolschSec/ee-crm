@@ -12,7 +12,7 @@ class LoginView(View):
         self.password = None
         self.login_instance = LoginController()
 
-    def handle(self, *args, **kwargs):
+    def handle(self, **kwargs):
         self.get_password(**kwargs)
         self.authenticate(**kwargs)
 
