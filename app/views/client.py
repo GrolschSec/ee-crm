@@ -1,14 +1,21 @@
 from app.views.view import CRUDView
-from app.controllers.permission import isAuthenticated, isAdminOrSalesTeam
-from typer import echo
+from app.controllers.permission import isAuthenticated, isSalesTeam, isSalesReferent
+from app.controllers.client import ClientController
+from typer import echo, Exit
 
 
 class ClientView(CRUDView):
-    permission_classes = {"create": [isAuthenticated, isAdminOrSalesTeam]}
+    controller_class = ClientController
+
+    permission_classes = {
+        "create": [isAuthenticated, isSalesTeam],
+        "update": [isAuthenticated, isSalesReferent],
+    }
 
     def __init__(self) -> None:
         super().__init__()
         self.app.command("create")(self.handle_create)
+        self.app.command("update")(self.handle_update)
 
     def handle_create(
         self, fullname: str, email: str, phone: str, address: str, company_name: str
@@ -22,4 +29,32 @@ class ClientView(CRUDView):
         )
 
     def create(self, **kwargs):
-        pass
+        kwargs["sales_contact_id"] = kwargs["user"].id
+        self.controller.validate(**kwargs)
+        if self.controller.is_valid():
+            self.controller.save()
+            echo("Client created successfully.")
+        else:
+            echo(f"Error: {self.controller.retrieve_error()}")
+            raise Exit(1)
+
+    def handle_update(
+        self,
+        pk: int,
+        fullname: str = None,
+        email: str = None,
+        phone: str = None,
+        address: str = None,
+        company_name: str = None,
+    ):
+        return super().handle_update(
+            pk=pk,
+            fullname=fullname,
+            email=email,
+            phone=phone,
+            address=address,
+            company_name=company_name,
+        )
+
+    def update(self, **kwargs):
+        echo(self.controller.update(**kwargs))

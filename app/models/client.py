@@ -8,7 +8,7 @@ class Client(Base):
     __tablename__ = "clients"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    full_name: Mapped[str] = mapped_column(String(50))
+    fullname: Mapped[str] = mapped_column(String(50))
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     phone: Mapped[str] = mapped_column(String(20), nullable=False, unique=True)
     address: Mapped[str] = mapped_column(String(255))
