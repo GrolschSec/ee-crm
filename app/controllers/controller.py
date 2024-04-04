@@ -50,7 +50,7 @@ class ModelController:
     def init_errors_field(self, field):
         if field in self.errors:
             self.errors.pop(field)
-    
+
     def retrieve_error(self):
         return next(iter(self.errors.values()))
 
@@ -83,3 +83,29 @@ class ModelController:
         if not self.is_valid:
             raise IntegrityError("Invalid data.")
         self.object.save()
+
+    def list(self):
+        return self.model_class.all()
+
+    def update(self, **kwargs):
+        self.updated = False
+        obj = kwargs.get("obj")
+        self.values = {}
+
+        if obj is None:
+            return "No object provided for update."
+
+        self.validate(**kwargs)
+        if not self.is_valid:
+            return self.retrieve_error()
+        for field in self.fields:
+            if kwargs.get(field):
+                setattr(obj, field, kwargs.get(field))
+                self.updated = True
+        if self.updated:
+            obj.save()
+            return "User updated successfully."
+        return "No changes detected."
+
+    def delete(self, **kwargs):
+        raise NotImplementedError

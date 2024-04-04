@@ -77,10 +77,3 @@ class User(Base):
     def get_first_by_role(cls, **kwargs):
         session = Session()
         return session.query(User).filter(User.role.has(**kwargs)).first()
-
-    @classmethod
-    def all(cls):
-        session = Session()
-        query_res = session.query(cls).options(joinedload(cls.role)).all()
-        session.close()
-        return query_res

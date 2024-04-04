@@ -6,6 +6,7 @@ from app.controllers.permission import (
     AllowAny,
     isAuthenticated,
     isManagementTeam,
+    isAdminSpecialObject,
 )
 
 
@@ -14,11 +15,17 @@ class UserView(CRUDView):
 
     permission_classes = {
         "create": [AllowAny],
+        "list": [isAuthenticated, isManagementTeam],
+        "update": [isAuthenticated, isManagementTeam, isAdminSpecialObject],
+        "delete": [isAuthenticated, isManagementTeam, isAdminSpecialObject],
     }
 
     def __init__(self) -> None:
         super().__init__()
         self.app.command("create")(self.handle_create)
+        self.app.command("list")(self.handle_list)
+        self.app.command("update")(self.handle_update)
+        self.app.command("delete")(self.handle_delete)
 
     def handle_create(
         self,
@@ -53,8 +60,8 @@ class UserView(CRUDView):
 
     def create(self, **kwargs):
         admin = kwargs.get("admin")
-        if 'admin' in kwargs:
-            kwargs.pop('admin')
+        if "admin" in kwargs:
+            kwargs.pop("admin")
         if not kwargs.get("password"):
             kwargs["password"] = self.get_password()
         self.controller.validate(**kwargs)
@@ -66,6 +73,39 @@ class UserView(CRUDView):
             echo("User created successfully.")
         else:
             echo(f"Error: {self.controller.retrieve_error()}")
+
+    def handle_list(self):
+        super().handle_list()
+
+    def list(self, **kwargs):
+        users = self.controller.list()
+        headers = ["ID", "Fullname", "Role"]
+        data = [[user.id, user.fullname, user.role] for user in users if user.is_active]
+        echo(tabulate(data, headers=headers, tablefmt="pretty"))
+
+    def handle_update(
+        self,
+        pk: int,
+        fullname: str = Option(None, help="The new fullname of the user."),
+        email: str = Option(None, help="The new email of the user."),
+        role: str = Option(None, help="The new role of the user."),
+        password: str = Option(None, help="The new password of the user."),
+    ):
+        super().handle_update(
+            pk=pk, fullname=fullname, email=email, role=role, password=password
+        )
+
+    def update(self, **kwargs):
+        echo(self.controller.update(**kwargs))
+    
+    def handle_delete(self, pk: int, silent: bool = False):
+        super().handle_delete(pk=pk, silent=silent)
+    
+    def delete(self, **kwargs):
+        if not kwargs.get("silent"):
+            if not prompt("Are you sure you want to delete this user ? (Y/n)").lower() == "y":
+                return
+        echo(self.controller.delete(**kwargs))
 
     def get_password(self):
         while True:
