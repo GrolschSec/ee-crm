@@ -8,6 +8,8 @@ from .base import Base
 from app.config.database import Session
 from sqlalchemy.orm import joinedload
 from pytz import timezone
+from app.models.role import Role
+from sqlalchemy.orm.exc import NoResultFound
 
 
 class User(Base):
@@ -17,13 +19,27 @@ class User(Base):
     fullname: Mapped[str] = mapped_column(String(50))
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     _password: Mapped[str] = mapped_column(String(255), nullable=False)
-    role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"))
+    _role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"))
     is_active: Mapped[bool] = mapped_column(default=True)
     is_admin: Mapped[bool] = mapped_column(default=False)
 
-    role = relationship("Role", back_populates="users")
     clients = relationship("Client", back_populates="sales_contact")
     events = relationship("Event", back_populates="support_contact")
+
+    @property
+    def role(self):
+        with Session() as session:
+            role = session.query(Role).get(self._role_id)
+        return role.name if role else None
+
+    @role.setter
+    def role(self, role_name):
+        with Session() as session:
+            try:
+                role = session.query(Role).filter_by(name=role_name).one()
+                self._role_id = role.id
+            except NoResultFound:
+                raise ValueError(f"Role {role_name} not found.")
 
     @property
     def password(self):

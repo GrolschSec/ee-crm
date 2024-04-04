@@ -1,105 +1,80 @@
-from app.models import User, Role
-from email_validator import validate_email, EmailNotValidError
+from app.models import User
+from os import path
+from app.controllers.controller import ModelController
 
 
-class UserController:
+class UserController(ModelController):
+    model_class = User
 
-    @staticmethod
-    def admin_exist():
-        return User.get_first_by_role(name="admin") is not None
+    TOKEN_PATH = token_path = path.join(path.expanduser("~"), ".ee_token")
 
-    @staticmethod
-    def user_exist(**kwargs):
-        if User.get_instance(**kwargs) is not None:
-            return True
-        return False
-
-    @staticmethod
-    def validate_email(email):
-        try:
-            validate_email(email)
-            return True
-        except EmailNotValidError as e:
-            return False
-
-    @staticmethod
-    def validate_fullname(fullname):
+    def validate_fullname(self, fullname):
+        if self.errors.get("fullname"):
+            self.errors["fullname"] = ""
         if (len(fullname) < 6) or (len(fullname) > 50):
-            return [False, "Fullname must be between 6 and 50 characters."]
+            self.errors["fullname"] = "Fullname must be between 6 and 50 characters."
+            return False
         if not fullname.replace(" ", "").isalpha():
-            return [False, "Fullname must contain only alphabets."]
-        return [True, None]
-
-    @staticmethod
-    def validate_password(password):
-        if len(password) < 8:
-            return [False, "Password must be at least 8 characters."]
-        if not any(char.isdigit() for char in password):
-            return [False, "Password must contain at least one digit."]
-        if not any(char.isupper() for char in password):
-            return [False, "Password must contain at least one uppercase letter."]
-        if not any(char.islower() for char in password):
-            return [False, "Password must contain at least one lowercase letter."]
-        if not any(char in "!@#$%^&*()-+" for char in password):
-            return [False, "Password must contain at least one special character."]
-        return [True, None]
-
-    @staticmethod
-    def validate_role(role):
-        if role == "1":
-            return [True, "management"]
-        elif role == "2":
-            return [True, "sales"]
-        elif role == "3":
-            return [True, "support"]
-        return [False, "Invalid role number."]
-
-    @staticmethod
-    def create_user(user):
-        role_id = Role.get_instance(name=user["role"]).id
-        user = User(
-            fullname=user["fullname"],
-            email=user["email"],
-            password=user["password"],
-            role_id=role_id,
-        )
-        user.save()
+            self.errors["fullname"] = "Fullname must contain only alphabets."
+            return False
         return True
 
-    @staticmethod
-    def update_user(**kwargs):
-        updated = False
-        user = User.get_instance(id=kwargs.get("user_id"))
+    def validate_password(self, password):
+        if self.errors.get("password"):
+            self.errors["password"] = ""
+        if len(password) < 8:
+            self.errors["password"] = "Password must be at least 8 characters."
+            return False
+        if not any(char.isdigit() for char in password):
+            self.errors["password"] = "Password must contain at least one digit."
+            return False
+        if not any(char.isupper() for char in password):
+            self.errors[
+                "password"
+            ] = "Password must contain at least one uppercase letter."
+            return False
+        if not any(char.islower() for char in password):
+            self.errors[
+                "password"
+            ] = "Password must contain at least one lowercase letter."
+            return False
+        if not any(char in "!@#$%^&*()-+" for char in password):
+            self.errors[
+                "password"
+            ] = "Password must contain at least one special character."
+            return False
+        return True
 
-        if kwargs.get("fullname"):
-            user.fullname = kwargs.get("fullname")
-            updated = True
-        if kwargs.get("email"):
-            user.email = kwargs.get("email")
-            updated = True
-        if kwargs.get("role"):
-            user.role_id = Role.get_instance(name=kwargs.get("role")).id
-            updated = True
-        if kwargs.get("password"):
-            user.password = kwargs.get("password")
-            updated = True
-        if updated:
-            user.save()
-        return updated
+    def validate_role(self, role: str):
+        if self.errors.get("role"):
+            self.errors["role"] = ""
+        role = role.lower()
+        print(role)
+        if role != "management" and role != "sales" and role != "support" and role != "admin":
+            self.errors["role"] = "Invalid role."
+            return False
+        self.values["role"] = role
+        return True
 
-    @staticmethod
-    def anonymize(**kwargs):
-        user = User.get_instance(id=kwargs.get("user_id"))
-        user.fullname = "Anonymous"
-        user.email = "anonymous@anonymous.com"
-        user._password = "Anonymous"
-        user.role_id = Role.get_instance(name="anonymous").id
-        user.save()
+    @classmethod
+    def is_token_file_present(cls):
+        return path.exists(cls.TOKEN_PATH)
 
-    @staticmethod
-    def get_user(**kwargs):
-        return User.get_instance(**kwargs)
+    @classmethod
+    def read_token_from_file(cls):
+        try:
+            with open(cls.TOKEN_PATH, "r") as f:
+                cls.token = f.read()
+        except PermissionError:
+            cls.token = None
 
-    @staticmethod
-    def get_all_users():
-        return User.all()
+    @classmethod
+    def authenticate(cls):
+        if not cls.is_token_file_present():
+            return None
+        cls.read_token_from_file()
+        if not cls.token:
+            return None
+        cls.user_id = User.verify_jwt_token(cls.token)
+        cls.user = User.get_instance(id=cls.user_id)
+        return cls.user

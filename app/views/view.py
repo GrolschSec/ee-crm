@@ -62,8 +62,16 @@ class View:
 
 
 class CRUDView(View):
+    controller_class = None
+
     def __init__(self) -> None:
         self.app = Typer()
+        self.controller = self.get_controller_instance()
+
+    def get_controller_instance(self):
+        if self.controller_class:
+            return self.controller_class()
+        return None
 
     def handle_create(self, **kwargs):
         self.dispatch(request="create", **kwargs)
