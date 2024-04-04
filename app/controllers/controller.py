@@ -47,6 +47,13 @@ class ModelController:
     def get_validate_fields(self):
         return [m.replace("validate_", "") for m in self.validate_methods]
 
+    def init_errors_field(self, field):
+        if field in self.errors:
+            self.errors.pop(field)
+    
+    def retrieve_error(self):
+        return next(iter(self.errors.values()))
+
     def pop_view_args(self, **kwargs):
         view_args = ["request", "obj", "user"]
         for arg in view_args:
@@ -66,10 +73,10 @@ class ModelController:
 
             method(field_value)
 
-        self.object = self.model_class(**self.values)
-
     def is_valid(self):
         self.is_valid = not bool(self.errors)
+        if self.is_valid:
+            self.object = self.model_class(**self.values)
         return self.is_valid
 
     def save(self):

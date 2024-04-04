@@ -9,8 +9,7 @@ class UserController(ModelController):
     TOKEN_PATH = token_path = path.join(path.expanduser("~"), ".ee_token")
 
     def validate_fullname(self, fullname):
-        if self.errors.get("fullname"):
-            self.errors["fullname"] = ""
+        self.init_errors_field("fullname")
         if (len(fullname) < 6) or (len(fullname) > 50):
             self.errors["fullname"] = "Fullname must be between 6 and 50 characters."
             return False
@@ -20,8 +19,7 @@ class UserController(ModelController):
         return True
 
     def validate_password(self, password):
-        if self.errors.get("password"):
-            self.errors["password"] = ""
+        self.init_errors_field("password")
         if len(password) < 8:
             self.errors["password"] = "Password must be at least 8 characters."
             return False
@@ -46,15 +44,9 @@ class UserController(ModelController):
         return True
 
     def validate_role(self, role: str):
-        if self.errors.get("role"):
-            self.errors["role"] = ""
+        self.init_errors_field("role")
         role = role.lower()
-        if (
-            role != "management"
-            and role != "sales"
-            and role != "support"
-            and role != "admin"
-        ):
+        if role != "management" and role != "sales" and role != "support":
             self.errors["role"] = "Invalid role."
             return False
         self.values["role"] = role

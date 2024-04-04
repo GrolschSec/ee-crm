@@ -1,6 +1,6 @@
 from app.views.view import CRUDView
 from app.controllers.user import UserController
-from typer import echo, prompt, Exit
+from typer import echo, prompt, Exit, Option
 from tabulate import tabulate
 from app.controllers.permission import (
     AllowAny,
@@ -24,9 +24,16 @@ class UserView(CRUDView):
         self,
         fullname: str,
         email: str,
-        role: str,
-        password: str = None,
-        admin: bool = False,
+        role: str = Option(
+            None, help="The role of the user (e.g.: 'Sales', 'Management', 'Support')"
+        ),
+        password: str = Option(
+            None,
+            help="If set this will be used as the password for the user, if not an interactive prompt will be shown.",
+        ),
+        admin: bool = Option(
+            False, help="If set the user will be created as an admin user."
+        ),
     ):
         kwargs = {
             "fullname": fullname,
@@ -39,20 +46,26 @@ class UserView(CRUDView):
         if admin:
             UserAddAdminView().handle_create(**kwargs)
         else:
+            if role is None:
+                echo("Error: Role option is required for non-admin users.")
+                raise Exit(1)
             UserAddUserView().handle_create(**kwargs)
 
     def create(self, **kwargs):
-        if "admin" in kwargs:
-            kwargs.pop("admin")
+        admin = kwargs.get("admin")
+        if 'admin' in kwargs:
+            kwargs.pop('admin')
         if not kwargs.get("password"):
             kwargs["password"] = self.get_password()
         self.controller.validate(**kwargs)
+        if admin:
+            if "role" in self.controller.errors:
+                self.controller.errors.pop("role")
         if self.controller.is_valid():
             self.controller.save()
             echo("User created successfully.")
         else:
-            echo("Error: Invalid data.")
-            echo(self.controller.errors)
+            echo(f"Error: {self.controller.retrieve_error()}")
 
     def get_password(self):
         while True:
