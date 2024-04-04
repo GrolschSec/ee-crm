@@ -75,7 +75,7 @@ class UserController(ModelController):
         cls.user_id = User.verify_jwt_token(cls.token)
         cls.user = User.get_instance(id=cls.user_id)
         return cls.user
-    
+
     def delete(self, **kwargs):
         obj = kwargs.get("obj")
         if obj is None:

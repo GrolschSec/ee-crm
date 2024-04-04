@@ -1,6 +1,5 @@
-from sqlalchemy.orm import Mapped, RelationshipProperty, ColumnProperty
-import inspect
 from sqlalchemy.exc import IntegrityError
+import inspect
 
 
 class ModelController:

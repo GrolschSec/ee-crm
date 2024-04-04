@@ -97,13 +97,16 @@ class UserView(CRUDView):
 
     def update(self, **kwargs):
         echo(self.controller.update(**kwargs))
-    
+
     def handle_delete(self, pk: int, silent: bool = False):
         super().handle_delete(pk=pk, silent=silent)
-    
+
     def delete(self, **kwargs):
         if not kwargs.get("silent"):
-            if not prompt("Are you sure you want to delete this user ? (Y/n)").lower() == "y":
+            if (
+                not prompt("Are you sure you want to delete this user ? (Y/n)").lower()
+                == "y"
+            ):
                 return
         echo(self.controller.delete(**kwargs))
 
