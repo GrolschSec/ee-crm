@@ -1,6 +1,7 @@
 from app.models import User
 from os import path
 from app.controllers.controller import ModelController
+from uuid import uuid4
 
 
 class UserController(ModelController):
@@ -74,3 +75,15 @@ class UserController(ModelController):
         cls.user_id = User.verify_jwt_token(cls.token)
         cls.user = User.get_instance(id=cls.user_id)
         return cls.user
+    
+    def delete(self, **kwargs):
+        obj = kwargs.get("obj")
+        if obj is None:
+            return "No object provided for delete."
+        obj.fullname = "Unknown"
+        obj.email = f"{uuid4()}@unkown.com"
+        obj.password = str(uuid4())
+        obj.role = "anonymous"
+        obj.is_active = False
+        obj.save()
+        return "User deleted successfully."

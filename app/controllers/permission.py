@@ -26,28 +26,28 @@ class isAdmin(isAuthenticated):
     def has_permission(self, **kwargs):
         if not super().has_permission(**kwargs):
             return False
-        return kwargs.get("user").role.name == "admin"
+        return kwargs.get("user").role == "admin"
 
 
 class isManagementTeam(isAuthenticated):
     def has_permission(self, **kwargs):
         if not super().has_permission(**kwargs):
             return False
-        return kwargs.get("user").role.name == "management"
+        return kwargs.get("user").role == "management"
 
 
 class isSalesTeam(isAuthenticated):
     def has_permission(self, **kwargs):
         if not super().has_permission(**kwargs):
             return False
-        return kwargs.get("user").role.name == "sales"
+        return kwargs.get("user").role == "sales"
 
 
 class isSupportTeam(isAuthenticated):
     def has_permission(self, **kwargs):
         if not super().has_permission(**kwargs):
             return False
-        return kwargs.get("user").role.name == "support"
+        return kwargs.get("user").role == "support"
 
 
 class AllowAny(BasePermission):
@@ -58,3 +58,10 @@ class AllowAny(BasePermission):
 class isSalesReferent(isSalesTeam):
     def has_obj_permission(self, obj, **kwargs):
         return kwargs["user"].id == obj.sales_contact_id
+
+
+class isAdminSpecialObject(isAuthenticated):
+    def has_obj_permission(self, obj, **kwargs):
+        if obj.is_admin:
+            return kwargs.get("user").role == "admin"
+        return True
