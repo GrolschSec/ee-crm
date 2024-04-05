@@ -49,7 +49,7 @@ class Base(DeclarativeBase):
                 field_name = error_info.split('"')[1].split("_")
                 field_value = error_info.split("=")[1].split(")")[0].replace("(", "")
                 raise ValueError(
-                    f"the {field_name[1]} {field_name[2]} '{field_value}' already exists in table {field_name[0]}."
+                    f"the {field_name[1]} '{field_value}' already exists in database."
                 )
             else:
                 raise ValueError(f"Database: {error_info}")
