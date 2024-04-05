@@ -97,7 +97,7 @@ class ModelController:
         self.values = {}
 
         if obj is None:
-            return "No object provided for update."
+            return "No object available for update."
 
         self.validate(**kwargs)
         if not self.is_valid:
