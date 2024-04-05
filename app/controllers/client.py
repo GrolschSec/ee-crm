@@ -20,6 +20,7 @@ class ClientController(ModelController):
     # i should be able to do that since for the email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     # phone: Mapped[str] = mapped_column(String(20), nullable=False, unique=True)
 
+
 #     @classmethod
 #     def validate_phone(cls, phone):
 #         message = "invalid phone number."

@@ -71,6 +71,11 @@ class ModelController:
                 continue
 
             method(field_value)
+        try:
+            obj = self.model_class(**self.values)
+            obj.try_flush()
+        except Exception as e:
+            self.errors["db"] = str(e)
 
     def is_valid(self):
         self.is_valid = not bool(self.errors)

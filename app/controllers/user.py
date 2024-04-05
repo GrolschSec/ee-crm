@@ -28,19 +28,19 @@ class UserController(ModelController):
             self.errors["password"] = "Password must contain at least one digit."
             return False
         if not any(char.isupper() for char in password):
-            self.errors[
-                "password"
-            ] = "Password must contain at least one uppercase letter."
+            self.errors["password"] = (
+                "Password must contain at least one uppercase letter."
+            )
             return False
         if not any(char.islower() for char in password):
-            self.errors[
-                "password"
-            ] = "Password must contain at least one lowercase letter."
+            self.errors["password"] = (
+                "Password must contain at least one lowercase letter."
+            )
             return False
         if not any(char in "!@#$%^&*()-+" for char in password):
-            self.errors[
-                "password"
-            ] = "Password must contain at least one special character."
+            self.errors["password"] = (
+                "Password must contain at least one special character."
+            )
             return False
         return True
 
