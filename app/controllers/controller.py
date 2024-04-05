@@ -1,4 +1,3 @@
-from sqlalchemy.exc import IntegrityError
 import inspect
 
 
