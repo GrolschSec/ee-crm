@@ -85,7 +85,7 @@ class ModelController:
 
     def save(self):
         if not self.is_valid:
-            raise IntegrityError("Invalid data.")
+            raise ValueError("Invalid data.")
         self.object.save()
 
     def list(self):
