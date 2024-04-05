@@ -108,7 +108,7 @@ class ModelController:
                 self.updated = True
         if self.updated:
             obj.save()
-            return "User updated successfully."
+            return f"{type(obj).__name__} updated successfully."
         return "No changes detected."
 
     def delete(self, **kwargs):
