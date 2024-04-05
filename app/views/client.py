@@ -1,20 +1,27 @@
-from app.views.view import CRUDView
-from app.controllers.permission import isAuthenticated, isSalesTeam, isSalesReferent
 from app.controllers.client import ClientController
+from app.views.view import CRUDView
+from app.controllers.permission import (
+    isSalesTeam,
+    isSalesReferent,
+    isSalesOrManagement,
+)
 from typer import echo, Exit
+from tabulate import tabulate
 
 
 class ClientView(CRUDView):
     controller_class = ClientController
 
     permission_classes = {
-        "create": [isAuthenticated, isSalesTeam],
-        "update": [isAuthenticated, isSalesReferent],
+        "create": [isSalesTeam],
+        "list": [isSalesOrManagement],
+        "update": [isSalesReferent],
     }
 
     def __init__(self) -> None:
         super().__init__()
         self.app.command("create")(self.handle_create)
+        self.app.command("list")(self.handle_list)
         self.app.command("update")(self.handle_update)
 
     def handle_create(
@@ -37,6 +44,25 @@ class ClientView(CRUDView):
         else:
             echo(f"Error: {self.controller.retrieve_error()}")
             raise Exit(1)
+
+    def handle_list(self):
+        return super().handle_list()
+
+    def list(self, **kwargs):
+        clients = self.controller.list()
+        headers = ["ID", "Fullname", "Email", "Phone", "Address", "Company Name"]
+        data = [
+            [
+                client.id,
+                client.fullname,
+                client.email,
+                client.phone,
+                client.address,
+                client.company_name,
+            ]
+            for client in clients
+        ]
+        echo(tabulate(data, headers=headers, tablefmt="pretty"))
 
     def handle_update(
         self,

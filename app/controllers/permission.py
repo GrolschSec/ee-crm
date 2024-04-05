@@ -65,3 +65,10 @@ class isAdminSpecialObject(isAuthenticated):
         if obj.is_admin:
             return kwargs.get("user").role == "admin"
         return True
+
+
+class isSalesOrManagement(isAuthenticated):
+    def has_permission(self, **kwargs):
+        return isSalesTeam().has_permission(
+            **kwargs
+        ) or isManagementTeam().has_permission(**kwargs)
