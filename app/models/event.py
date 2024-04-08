@@ -14,7 +14,9 @@ class Event(Base):
     attendees_count: Mapped[int] = mapped_column()
     notes: Mapped[str] = mapped_column(String(255))
     contract_id: Mapped[int] = mapped_column(ForeignKey("contracts.id"))
-    support_contact_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    support_contact_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"), nullable=True
+    )
 
     contract = relationship("Contract", back_populates="event")
     support_contact = relationship("User", back_populates="events")
