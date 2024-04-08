@@ -14,19 +14,30 @@ def test_password_hashing():
     assert user._password != "password"
 
 
-def test_password_verification():
+def test_password_verification_valid():
     user = User(fullname="test", email="test@gmail.com", password="password")
     assert user.verify_password("password") is True
 
+def test_password_verification_fail():
+    user = User(fullname="test", email="test@gmail.com", password="password")
+    assert user.verify_password("password123") is False
 
-def test_user_relationships(role_management, session):
-    user = User(
-        fullname="test",
-        email="test@gmail.com",
-        password="password",
-        role_id=role_management.id,
-    )
+
+def test_create_valid_user(session):
+    user = User(fullname="test", email="test@gmail.com", password="password", role="sales")
     session.add(user)
     session.commit()
-    assert user.role_id == role_management.id
-    assert user.role.name == "management"
+    assert user.id is not None
+    assert user.fullname == "test"
+    assert user.email == "test@gmail.com"
+    assert user.role == "sales"
+
+def test_create_user_invalid_email(session):
+    with pytest.raises(ValueError, match="Invalid email."):
+        User(fullname="test", email="test", password="password", role="sales")
+
+def test_create_user_invalid_role(session):
+    with pytest.raises(ValueError, match="Role test not found."):
+        User(fullname="test", email="test@gmail.com", password="password", role="test")
+
+

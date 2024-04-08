@@ -33,22 +33,45 @@ def role_support():
 def role_sales():
     return Role(name="sales")
 
+@pytest.fixture()
+def role_admin():
+    return Role(name="admin")
+
+@pytest.fixture()
+def role_anonymous():
+    return Role(name="anonymous")
+
 
 @pytest.fixture(autouse=True)
-def set_role_to_db(session, role_management, role_support, role_sales):
-    session.add_all([role_management, role_support, role_sales])
+def set_roles_to_db(session, role_management, role_support, role_sales, role_admin, role_anonymous):
+    session.add_all([role_management, role_support, role_sales, role_admin, role_anonymous])
     session.commit()
     return session.query(Role).all()
 
 
-@pytest.fixture()
-def testuser(session, role_sales):
+def create_user(session, email, role):
     user = User(
         fullname="test",
-        email="test@gmail.com",
+        email=email,
         password="password",
-        role_id=role_sales.id,
+        role=role,
     )
     session.add(user)
     session.commit()
     return user
+
+@pytest.fixture()
+def sales_user(session):
+    return create_user(session, "test_sales@gmail.com", "sales")
+
+@pytest.fixture()
+def support_user(session):
+    return create_user(session, "test_support@gmail.com", "support")
+
+@pytest.fixture()
+def management_user(session):
+    return create_user(session, "test_management@gmail.com", "management")
+
+@pytest.fixture()
+def admin_user(session):
+    return create_user(session, "test_admin@gmail.com", "admin")

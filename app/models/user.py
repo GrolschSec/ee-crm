@@ -6,7 +6,7 @@ from passlib.exc import UnknownHashError
 from app.config.settings import pwd_context, JWT, TIMEZONE
 from .base import Base
 from app.config.database import Session
-from sqlalchemy.orm import joinedload
+from sqlalchemy import select
 from pytz import timezone
 from app.models.role import Role
 from sqlalchemy.orm.exc import NoResultFound
@@ -29,14 +29,14 @@ class User(Base):
     @property
     def role(self):
         with Session() as session:
-            role = session.query(Role).get(self._role_id)
+            role = session.get(Role, self._role_id)
         return role.name if role else None
 
     @role.setter
     def role(self, role_name):
         with Session() as session:
             try:
-                role = session.query(Role).filter_by(name=role_name).one()
+                role = session.execute(select(Role).where(Role.name == role_name)).scalars().one()
                 self._role_id = role.id
             except NoResultFound:
                 raise ValueError(f"Role {role_name} not found.")
