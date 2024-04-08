@@ -2,13 +2,14 @@ import pytest
 from app.models import Event
 from datetime import datetime
 
+
 def test_event_attributes(contract, support_user):
     contract_id = contract.id
     contract.close()
     support_user_id = support_user.id
     support_user.close()
-    start_date=datetime.strptime("2021-05-01", "%Y-%m-%d")
-    end_date=datetime.strptime("2021-06-01", "%Y-%m-%d")
+    start_date = datetime.strptime("2021-05-01", "%Y-%m-%d")
+    end_date = datetime.strptime("2021-06-01", "%Y-%m-%d")
     event = Event(
         start_date=start_date,
         end_date=end_date,

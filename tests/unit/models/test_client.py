@@ -13,7 +13,6 @@ def test_client_attributes():
         sales_contact_id=1,
     )
     client.save()
-
     assert client.fullname == "Test Client"
     assert client.email == "test@gmail.com"
     assert client.phone == "+33695454332"
@@ -27,7 +26,7 @@ def test_client_attributes():
 
 def test_client_invalid_phone_number():
     with pytest.raises(ValueError, match="Invalid phone number."):
-        client = Client(
+        Client(
             fullname="Test Client",
             email="test@gmail.com",
             phone="+3369545",
@@ -39,7 +38,7 @@ def test_client_invalid_phone_number():
 
 def test_client_invalid_email():
     with pytest.raises(ValueError, match="Invalid email."):
-        client = Client(
+        Client(
             fullname="Test Client",
             email="test@s.com",
             phone="+33695452233",

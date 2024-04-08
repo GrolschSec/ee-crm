@@ -99,6 +99,7 @@ def management_user():
 def admin_user():
     return create_user("test_admin@gmail.com", "admin")
 
+
 @pytest.fixture()
 def client(sales_user):
     user_id = sales_user.id
@@ -113,6 +114,7 @@ def client(sales_user):
     )
     client.save()
     return client
+
 
 @pytest.fixture()
 def contract(client):
