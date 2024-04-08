@@ -4,8 +4,11 @@ argon2-cffi-bindings==21.2.0
 cffi==1.16.0
 click==8.1.7
 colorama==0.4.6
+coverage==7.4.4
 dnspython==2.6.1
 email_validator==2.1.1
+geographiclib==2.0
+geopy==2.4.1
 greenlet==3.0.3
 idna==3.6
 iniconfig==2.0.0
