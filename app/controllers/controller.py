@@ -9,6 +9,7 @@ class ModelController:
         self.fields = self.get_field_names()
         self.validate_methods = self.get_validate_methods()
         self.object = None
+        self.session = None
 
     @classmethod
     def get_object(cls, **kwargs):
@@ -70,26 +71,32 @@ class ModelController:
                 continue
 
             method(field_value)
+        obj = None
         try:
             obj = self.model_class(**self.values)
             obj.try_flush()
         except Exception as e:
             self.errors["db"] = str(e)
+        finally:
+            if obj is not None:
+                obj.close()
 
     def is_valid(self):
         self.is_valid = not bool(self.errors)
         if self.is_valid:
             self.object = self.model_class(**self.values)
+            self.session = self.object.session
         return self.is_valid
 
     def save(self):
         if not self.is_valid:
             raise ValueError("Invalid data.")
         self.object.save()
-        self.object.close()
 
     def list(self):
-        return self.model_class.all()
+        result = self.model_class.all()
+        self.session = result[1]
+        return result[0]
 
     def update(self, **kwargs):
         self.updated = False
@@ -99,6 +106,7 @@ class ModelController:
         if obj is None:
             return "No object available for update."
 
+        self.session = obj.session
         self.validate(**kwargs)
         if not self.is_valid:
             return self.retrieve_error()
@@ -113,3 +121,7 @@ class ModelController:
 
     def delete(self, **kwargs):
         raise NotImplementedError
+
+    def __del__(self):
+        if self.session is not None:
+            self.session.close()

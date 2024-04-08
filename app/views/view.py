@@ -37,6 +37,7 @@ class View:
 
         for permission in self.get_permission(**kwargs):
             if kwargs.get("obj") and not permission().has_obj_permission(**kwargs):
+                kwargs.get("obj").close()
                 return False
         return True
 

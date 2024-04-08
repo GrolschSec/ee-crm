@@ -4,6 +4,7 @@ from app.controllers.permission import (
     isSalesTeam,
     isSalesReferent,
     isAuthenticated,
+    isAdmin,
 )
 from typer import echo, Exit
 from tabulate import tabulate
@@ -16,6 +17,7 @@ class ClientView(CRUDView):
         "create": [isSalesTeam],
         "list": [isAuthenticated],
         "update": [isSalesReferent],
+        "delete": [isAdmin],
     }
 
     def __init__(self) -> None:
@@ -23,6 +25,7 @@ class ClientView(CRUDView):
         self.app.command("create")(self.handle_create)
         self.app.command("list")(self.handle_list)
         self.app.command("update")(self.handle_update)
+        # self.app.command("delete")(self.handle_delete)
 
     def handle_create(
         self, fullname: str, email: str, phone: str, address: str, company_name: str
@@ -50,7 +53,15 @@ class ClientView(CRUDView):
 
     def list(self, **kwargs):
         clients = self.controller.list()
-        headers = ["ID", "Fullname", "Email", "Phone", "Address", "Company Name"]
+        headers = [
+            "ID",
+            "Fullname",
+            "Email",
+            "Phone",
+            "Address",
+            "Company Name",
+            "Sales Contact",
+        ]
         data = [
             [
                 client.id,
@@ -59,6 +70,7 @@ class ClientView(CRUDView):
                 client.phone,
                 client.address,
                 client.company_name,
+                client.sales_contact.fullname,
             ]
             for client in clients
         ]
@@ -84,3 +96,9 @@ class ClientView(CRUDView):
 
     def update(self, **kwargs):
         echo(self.controller.update(**kwargs))
+
+    def handle_delete(self, pk: int):
+        return super().handle_delete(pk=pk)
+
+    def delete(self, **kwargs):
+        echo(self.controller.delete(**kwargs))

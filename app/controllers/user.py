@@ -86,4 +86,5 @@ class UserController(ModelController):
         obj.role = "anonymous"
         obj.is_active = False
         obj.save()
+        obj.close()
         return "User deleted successfully."

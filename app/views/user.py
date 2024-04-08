@@ -80,7 +80,11 @@ class UserView(CRUDView):
     def list(self, **kwargs):
         users = self.controller.list()
         headers = ["ID", "Fullname", "Email", "Role"]
-        data = [[user.id, user.fullname, user.email, user.role] for user in users if user.is_active]
+        data = [
+            [user.id, user.fullname, user.email, user.role]
+            for user in users
+            if user.is_active
+        ]
         echo(tabulate(data, headers=headers, tablefmt="pretty"))
 
     def handle_update(

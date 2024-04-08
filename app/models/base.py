@@ -1,5 +1,9 @@
+from typing import Any
+from app.config.settings import PHONE_REGION
+from app.config.database import get_session
 from sqlalchemy.orm import DeclarativeBase, validates, joinedload
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import select
 from email_validator import validate_email, EmailNotValidError
 from phonenumbers import (
     parse,
@@ -8,12 +12,15 @@ from phonenumbers import (
     format_number,
     PhoneNumberFormat,
 )
-from app.config.settings import PHONE_REGION
-from app.config.database import get_session
-from copy import deepcopy
 
 
 class Base(DeclarativeBase):
+    def __init__(self, **kwargs: Any):
+        super().__init__()
+        self.session = get_session()
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
     @validates("email")
     def validate_email(self, key, email):
         try:
@@ -34,7 +41,6 @@ class Base(DeclarativeBase):
         return formatted_phone
 
     def save(self):
-        self.session = get_session()
         self.session.add(self)
         self.session.commit()
         return self
@@ -43,10 +49,9 @@ class Base(DeclarativeBase):
         self.session.close()
 
     def try_flush(self):
-        session = get_session()
-        session.merge(self)
+        self.session.merge(self)
         try:
-            session.flush()
+            self.session.flush()
         except IntegrityError as e:
             error_info = e.orig.args[0] if e.orig.args else str(e)
             if "unique constraint" in error_info:
@@ -58,35 +63,30 @@ class Base(DeclarativeBase):
             else:
                 raise ValueError(f"Database: {error_info}")
         finally:
-            session.rollback()
-            session.close()
+            self.session.rollback()
 
     @classmethod
     def get_instance(cls, id: int = None, **kwargs):
-        query_res = None
+        instance = None
         session = get_session()
         if id:
-            query_res = session.query(cls).options(joinedload("*")).get(id)
-        if kwargs:
-            query_res = (
-                session.query(cls).options(joinedload("*")).filter_by(**kwargs).first()
-            )
-        session.close()
-        return query_res
-
-    def refresh(self):
-        return Base.get_instance(self)
-
-    @classmethod
-    def filter_by(cls, **kwargs):
-        session = get_session()
-        query_res = session.query(cls).filter_by(**kwargs)
-        session.close()
-        return query_res
+            stmt = select(cls).options(joinedload("*")).where(cls.id == id)
+            result = session.execute(stmt)
+            instance = result.scalars().first()
+        if kwargs and not instance:
+            stmt = select(cls).options(joinedload("*")).where(*[getattr(cls, k)==v for k, v in kwargs.items()])
+            result = session.execute(stmt)
+            instance = result.scalars().first()
+        if instance:
+            instance.session = session
+        else:
+            session.close()
+        return instance
 
     @classmethod
     def all(cls):
         session = get_session()
-        query_res = session.query(cls).all()
-        session.close()
-        return query_res
+        stmt = select(cls)
+        result = session.execute(stmt)
+        instance_lst = result.scalars().all()
+        return [instance_lst, session]

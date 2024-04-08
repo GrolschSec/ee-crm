@@ -14,3 +14,7 @@ class ClientController(ModelController):
             self.errors["fullname"] = "Fullname must contain only alphabets."
             return False
         return True
+
+    def delete(self, **kwargs):
+        # If we delete a client, we should also delete all the related datas
+        pass
