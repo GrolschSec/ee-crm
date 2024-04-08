@@ -6,4 +6,13 @@ DATABASE_URL = f"{DATABASE['ENGINE']}://{DATABASE['USER']}:{DATABASE['PASSWORD']
 
 engine = create_engine(DATABASE_URL)
 
-Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+_Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Session = None
+
+
+def get_session():
+    global Session
+    if Session is None:
+        Session = _Session
+    return Session()

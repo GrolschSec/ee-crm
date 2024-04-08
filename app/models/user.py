@@ -5,7 +5,7 @@ from jwt import encode, decode, ExpiredSignatureError, DecodeError
 from passlib.exc import UnknownHashError
 from app.config.settings import pwd_context, JWT, TIMEZONE
 from .base import Base
-from app.config.database import Session
+from app.config.database import get_session
 from sqlalchemy import select
 from pytz import timezone
 from app.models.role import Role
@@ -28,13 +28,13 @@ class User(Base):
 
     @property
     def role(self):
-        with Session() as session:
+        with get_session() as session:
             role = session.get(Role, self._role_id)
         return role.name if role else None
 
     @role.setter
     def role(self, role_name):
-        with Session() as session:
+        with get_session() as session:
             try:
                 role = (
                     session.execute(select(Role).where(Role.name == role_name))
@@ -79,5 +79,5 @@ class User(Base):
 
     @classmethod
     def get_first_by_role(cls, **kwargs):
-        session = Session()
+        session = get_session()
         return session.query(User).filter(User.role.has(**kwargs)).first()

@@ -2,21 +2,29 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.models import Base, Role, User
+from app.config import database
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def engine():
-    test_database = "sqlite:///:memory:"
-    return create_engine(test_database)
+    return create_engine("sqlite:///:memory:")
 
 
-@pytest.fixture()
-def session(engine):
+@pytest.fixture(scope="session")
+def session_obj(engine):
+    return sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+@pytest.fixture(scope="function", autouse=True)
+def mock_session(session_obj, monkeypatch):
+    monkeypatch.setattr(database, "Session", session_obj)
+
+
+@pytest.fixture(scope="function")
+def setup_database(engine):
     Base.metadata.create_all(engine)
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    session = SessionLocal()
-    yield session
-    session.close()
+    yield
+    Base.metadata.drop_all(engine)
 
 
 @pytest.fixture()
@@ -33,9 +41,11 @@ def role_support():
 def role_sales():
     return Role(name="sales")
 
+
 @pytest.fixture()
 def role_admin():
     return Role(name="admin")
+
 
 @pytest.fixture()
 def role_anonymous():
@@ -43,35 +53,44 @@ def role_anonymous():
 
 
 @pytest.fixture(autouse=True)
-def set_roles_to_db(session, role_management, role_support, role_sales, role_admin, role_anonymous):
-    session.add_all([role_management, role_support, role_sales, role_admin, role_anonymous])
+def set_roles_to_db(
+    setup_database,
+    session_obj,
+    role_management,
+    role_support,
+    role_sales,
+    role_admin,
+    role_anonymous,
+):
+    session = session_obj()
+    session.add_all(
+        [role_management, role_support, role_sales, role_admin, role_anonymous]
+    )
     session.commit()
-    return session.query(Role).all()
 
 
-def create_user(session, email, role):
+def create_user(email, role):
     user = User(
         fullname="test",
         email=email,
         password="password",
         role=role,
     )
-    session.add(user)
-    session.commit()
+    user.save()
     return user
 
 @pytest.fixture()
-def sales_user(session):
-    return create_user(session, "test_sales@gmail.com", "sales")
+def sales_user():
+    return create_user("test_sales@gmail.com", "sales")
 
 @pytest.fixture()
-def support_user(session):
-    return create_user(session, "test_support@gmail.com", "support")
+def support_user():
+    return create_user("test_support@gmail.com", "support")
 
 @pytest.fixture()
-def management_user(session):
-    return create_user(session, "test_management@gmail.com", "management")
+def management_user():
+    return create_user("test_management@gmail.com", "management")
 
 @pytest.fixture()
-def admin_user(session):
-    return create_user(session, "test_admin@gmail.com", "admin")
+def admin_user():
+    return create_user("test_admin@gmail.com", "admin")
