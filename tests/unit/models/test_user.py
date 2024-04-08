@@ -28,11 +28,12 @@ def test_create_valid_user():
     user = User(
         fullname="test", email="test@gmail.com", password="password", role="sales"
     )
-    user.save()
+    user = user.save()
     assert user.id is not None
     assert user.fullname == "test"
     assert user.email == "test@gmail.com"
     assert user.role == "sales"
+    user.close()
 
 
 def test_create_user_invalid_email():

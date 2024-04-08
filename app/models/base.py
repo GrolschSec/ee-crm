@@ -9,7 +9,8 @@ from phonenumbers import (
     PhoneNumberFormat,
 )
 from app.config.settings import PHONE_REGION
-from app.config.database import Session
+from app.config.database import get_session
+from copy import deepcopy
 
 
 class Base(DeclarativeBase):
@@ -33,13 +34,16 @@ class Base(DeclarativeBase):
         return formatted_phone
 
     def save(self):
-        session = Session()
-        session.merge(self)
-        session.commit()
-        session.close()
+        self.session = get_session()
+        self.session.add(self)
+        self.session.commit()
+        return self
+
+    def close(self):
+        self.session.close()
 
     def try_flush(self):
-        session = Session()
+        session = get_session()
         session.merge(self)
         try:
             session.flush()
@@ -60,7 +64,7 @@ class Base(DeclarativeBase):
     @classmethod
     def get_instance(cls, id: int = None, **kwargs):
         query_res = None
-        session = Session()
+        session = get_session()
         if id:
             query_res = session.query(cls).options(joinedload("*")).get(id)
         if kwargs:
@@ -71,20 +75,18 @@ class Base(DeclarativeBase):
         return query_res
 
     def refresh(self):
-        session = Session()
-        session.refresh(self)
-        return self
+        return Base.get_instance(self)
 
     @classmethod
     def filter_by(cls, **kwargs):
-        session = Session()
+        session = get_session()
         query_res = session.query(cls).filter_by(**kwargs)
         session.close()
         return query_res
 
     @classmethod
     def all(cls):
-        session = Session()
+        session = get_session()
         query_res = session.query(cls).all()
         session.close()
         return query_res

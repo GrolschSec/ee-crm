@@ -79,17 +79,21 @@ def create_user(email, role):
     user.save()
     return user
 
+
 @pytest.fixture()
 def sales_user():
     return create_user("test_sales@gmail.com", "sales")
+
 
 @pytest.fixture()
 def support_user():
     return create_user("test_support@gmail.com", "support")
 
+
 @pytest.fixture()
 def management_user():
     return create_user("test_management@gmail.com", "management")
+
 
 @pytest.fixture()
 def admin_user():

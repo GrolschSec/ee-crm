@@ -20,8 +20,9 @@ def test_client_attributes():
     assert client.address == "123 Test St"
     assert client.company_name == "Test Company"
     assert client.sales_contact_id == 1
-    # assert isinstance(client.creation_date, date)
-    # assert isinstance(client.last_update, datetime)
+    assert isinstance(client.creation_date, date)
+    assert isinstance(client.last_update, datetime)
+    client.close()
 
 
 def test_client_invalid_phone_number():
