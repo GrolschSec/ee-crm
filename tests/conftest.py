@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.models import Base, Role, User, Client
+from app.models import Base, Role, User, Client, Contract
 from app.config import database
 
 
@@ -113,3 +113,15 @@ def client(sales_user):
     )
     client.save()
     return client
+
+@pytest.fixture()
+def contract(client):
+    client_id = client.id
+    client.close()
+    contract = Contract(
+        client_id=client_id,
+        amount_total=1000.00,
+        amount_due=500.00,
+    )
+    contract.save()
+    return contract
