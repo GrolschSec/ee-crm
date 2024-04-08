@@ -6,7 +6,7 @@ load_dotenv()
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
-PHONE_REGION = "FR"
+PHONE_REGION = getenv("PHONE_REGION")
 
 DATABASE = {
     "ENGINE": getenv("DB_ENGINE"),
