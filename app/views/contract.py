@@ -1,5 +1,9 @@
 from app.controllers.contract import ContractController
-from app.controllers.permission import isManagementTeam, isAuthenticated, isManagementOrSalesReferentContract
+from app.controllers.permission import (
+    isManagementTeam,
+    isAuthenticated,
+    isManagementOrSalesReferentContract,
+)
 from app.views.view import CRUDView
 from typer import echo, Exit
 from tabulate import tabulate
@@ -34,10 +38,10 @@ class ContractView(CRUDView):
         else:
             echo(f"Error: {self.controller.retrieve_error()}")
             raise Exit(1)
-        
+
     def handle_list(self):
         return super().handle_list()
-    
+
     def list(self, **kwargs):
         contracts = self.controller.list()
         headers = [
@@ -57,7 +61,7 @@ class ContractView(CRUDView):
                 contract.amount_total,
                 contract.amount_due,
                 contract.creation_date,
-                "Signed" if contract.is_signed else "Not signed"
+                "Signed" if contract.is_signed else "Not signed",
             ]
             for contract in contracts
         ]
@@ -73,12 +77,12 @@ class ContractView(CRUDView):
         return super().handle_update(
             pk=pk, amount_total=amount_total, amount_due=amount_due, is_signed=is_signed
         )
-    
+
     def update(self, **kwargs):
         echo(self.controller.update(**kwargs))
-    
+
     def handle_delete(self, pk: int):
         return super().handle_delete(pk=pk)
-    
+
     def delete(self, **kwargs):
         echo(self.controller.delete(**kwargs))

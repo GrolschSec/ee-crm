@@ -74,7 +74,11 @@ class Base(DeclarativeBase):
             result = session.execute(stmt)
             instance = result.scalars().first()
         if kwargs and not instance:
-            stmt = select(cls).options(joinedload("*")).where(*[getattr(cls, k)==v for k, v in kwargs.items()])
+            stmt = (
+                select(cls)
+                .options(joinedload("*"))
+                .where(*[getattr(cls, k) == v for k, v in kwargs.items()])
+            )
             result = session.execute(stmt)
             instance = result.scalars().first()
         if instance:

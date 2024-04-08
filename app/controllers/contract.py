@@ -23,7 +23,7 @@ class ContractController(ModelController):
         else:
             client.close()
         return True
-    
+
     def validate_amount_total(self, amount_total):
         self.init_errors_field("amount_total")
         if not amount_total:
@@ -33,7 +33,9 @@ class ContractController(ModelController):
             self.amount_total = amount_total
         else:
             if amount_total < self.amount_due:
-                self.errors["amount_total"] = "Total amount must be greater than due amount."
+                self.errors["amount_total"] = (
+                    "Total amount must be greater than due amount."
+                )
                 return False
         return True
 
@@ -46,7 +48,9 @@ class ContractController(ModelController):
             self.amount_due = amount_due
         else:
             if amount_due > self.amount_total:
-                self.errors["amount_due"] = "Total amount must be greater than due amount."
+                self.errors["amount_due"] = (
+                    "Total amount must be greater than due amount."
+                )
                 return False
         return True
 
