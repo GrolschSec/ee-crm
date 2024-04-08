@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.models import Base, Role, User
+from app.models import Base, Role, User, Client
 from app.config import database
 
 
@@ -98,3 +98,18 @@ def management_user():
 @pytest.fixture()
 def admin_user():
     return create_user("test_admin@gmail.com", "admin")
+
+@pytest.fixture()
+def client(sales_user):
+    user_id = sales_user.id
+    sales_user.close()
+    client = Client(
+        fullname="Test Client",
+        email="test_client@gmail.com",
+        phone="+33695454332",
+        address="123 Test St",
+        company_name="Test Company",
+        sales_contact_id=user_id,
+    )
+    client.save()
+    return client
