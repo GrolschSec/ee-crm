@@ -1,5 +1,5 @@
 from app.controllers.contract import ContractController
-from app.controllers.permission import isManagementTeam
+from app.controllers.permission import isManagementTeam, isAuthenticated
 from app.views.view import CRUDView
 from typer import echo, Exit
 
@@ -10,6 +10,7 @@ class ContractView(CRUDView):
 
     permission_classes = {
         "create": [isManagementTeam],
+        "list": [isAuthenticated],
     }
 
     def __init__(self) -> None:

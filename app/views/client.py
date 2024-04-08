@@ -3,7 +3,7 @@ from app.views.view import CRUDView
 from app.controllers.permission import (
     isSalesTeam,
     isSalesReferent,
-    isSalesOrManagement,
+    isAuthenticated,
 )
 from typer import echo, Exit
 from tabulate import tabulate
@@ -14,7 +14,7 @@ class ClientView(CRUDView):
 
     permission_classes = {
         "create": [isSalesTeam],
-        "list": [isSalesOrManagement],
+        "list": [isAuthenticated],
         "update": [isSalesReferent],
     }
 
