@@ -70,6 +70,11 @@ class Base(DeclarativeBase):
         session.close()
         return query_res
 
+    def refresh(self):
+        session = Session()
+        session.refresh(self)
+        return self
+
     @classmethod
     def filter_by(cls, **kwargs):
         session = Session()

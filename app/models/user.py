@@ -36,7 +36,11 @@ class User(Base):
     def role(self, role_name):
         with Session() as session:
             try:
-                role = session.execute(select(Role).where(Role.name == role_name)).scalars().one()
+                role = (
+                    session.execute(select(Role).where(Role.name == role_name))
+                    .scalars()
+                    .one()
+                )
                 self._role_id = role.id
             except NoResultFound:
                 raise ValueError(f"Role {role_name} not found.")
