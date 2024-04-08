@@ -4,6 +4,7 @@ from app.views.logout import LogoutView
 from app.views.user import UserView
 from app.views.client import ClientView
 from app.views.contract import ContractView
+from app.views.event import EventView
 
 app = Typer()
 
@@ -25,3 +26,5 @@ app.add_typer(UserView().app, name="user", help="User management commands.")
 app.add_typer(ClientView().app, name="client", help="Client management commands.")
 
 app.add_typer(ContractView().app, name="contract", help="Contract management commands.")
+
+app.add_typer(EventView().app, name="event", help="Event management commands.")
