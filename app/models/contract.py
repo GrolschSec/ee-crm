@@ -12,6 +12,7 @@ class Contract(Base):
     amount_total: Mapped[float] = mapped_column(Numeric(10, 2))
     amount_due: Mapped[float] = mapped_column(Numeric(10, 2))
     creation_date: Mapped[date] = mapped_column(Date, default=date.today())
+    is_signed: Mapped[bool] = mapped_column(default=False)
 
     client = relationship("Client", back_populates="contracts")
     event = relationship("Event", back_populates="contract")

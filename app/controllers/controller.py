@@ -86,6 +86,7 @@ class ModelController:
         if not self.is_valid:
             raise ValueError("Invalid data.")
         self.object.save()
+        self.object.close()
 
     def list(self):
         return self.model_class.all()
