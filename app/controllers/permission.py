@@ -72,3 +72,10 @@ class isSalesOrManagement(isAuthenticated):
         return isSalesTeam().has_permission(
             **kwargs
         ) or isManagementTeam().has_permission(**kwargs)
+
+class isManagementOrSalesReferentContract(isAuthenticated):
+
+    def has_obj_permission(self, obj, **kwargs):
+        if isManagementTeam().has_permission(**kwargs):
+            return True
+        return isSalesTeam().has_permission(**kwargs) and obj.client.sales_contact_id == kwargs["user"].id
