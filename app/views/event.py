@@ -1,6 +1,6 @@
 from app.views.view import CRUDView
 from app.controllers.event import EventController
-from app.controllers.permission import isAuthenticated, isSalesReferentEvent
+from app.controllers.permission import isAuthenticated, isSalesReferentEvent, isSalesReferentEventOrManagementTeam
 from typer import echo, Exit
 from tabulate import tabulate
 
@@ -11,12 +11,14 @@ class EventView(CRUDView):
     permission_classes = {
         "create": [isSalesReferentEvent],
         "list": [isAuthenticated],
+        "update": [isSalesReferentEventOrManagementTeam],
     }
 
     def __init__(self) -> None:
         super().__init__()
         self.app.command("create")(self.handle_create)
         self.app.command("list")(self.handle_list)
+        self.app.command("update")(self.handle_update)
 
     def handle_create(
         self,
@@ -58,7 +60,7 @@ class EventView(CRUDView):
             "Attendees Count",
             "Notes",
             "Contract ID",
-            "Support Contact ID",
+            "Support Contact",
         ]
         data = [
             [
@@ -72,9 +74,33 @@ class EventView(CRUDView):
                 (
                     "Not assigned"
                     if event.support_contact_id is None
-                    else event.support_contact_id
+                    else event.support_contact.fullname
                 ),
             ]
             for event in events
         ]
         echo(tabulate(data, headers=headers, tablefmt="pretty"))
+
+    def handle_update(
+        self,
+        pk: int,
+        start_date: str = None,
+        end_date: str = None,
+        location: str = None,
+        attendees_count: int = None,
+        notes: str = None,
+        support_contact_id: int = None,
+    ):
+        return super().handle_update(
+            pk=pk,
+            start_date=start_date,
+            end_date=end_date,
+            location=location,
+            attendees_count=attendees_count,
+            notes=notes,
+            support_contact_id=support_contact_id,
+        )
+
+    def update(self, **kwargs):
+        echo(self.controller.update(**kwargs))
+        

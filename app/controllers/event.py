@@ -1,5 +1,5 @@
 from app.controllers.controller import ModelController
-from app.models import Event, Contract
+from app.models import Event, Contract, User
 from datetime import datetime
 
 
@@ -56,3 +56,15 @@ class EventController(ModelController):
             self.errors["end_date"] = "Invalid end date."
         else:
             self.values["end_date"] = end_date
+
+    def validate_support_contact_id(self, support_contact_id):
+        self.init_errors_field("support_contact_id")
+        if not support_contact_id:
+            return
+        support_contact = User().get_instance(id=support_contact_id)
+        if support_contact is None:
+            self.errors["support_contact_id"] = "Support contact not found."
+            return False
+        else:
+            support_contact.close()
+        return True

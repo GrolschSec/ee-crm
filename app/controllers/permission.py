@@ -89,3 +89,8 @@ class isSalesReferentEvent(isAuthenticated):
 
     def has_obj_permission(self, obj, **kwargs):
         return isSalesTeam and kwargs["user"].id == obj.contract.client.sales_contact_id
+
+class isSalesReferentEventOrManagementTeam(isAuthenticated):
+
+    def has_obj_permission(self, obj, **kwargs):
+        return isManagementTeam().has_permission(**kwargs) or isSalesReferentEvent().has_obj_permission(obj, **kwargs)
