@@ -10,7 +10,6 @@ _Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Session = None
 
-
 def get_session():
     global Session
     if Session is None:

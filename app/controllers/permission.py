@@ -96,4 +96,7 @@ class isSupportReferentEventOrManagementTeam(isAuthenticated):
     def has_obj_permission(self, obj, **kwargs):
         if isManagementTeam().has_permission(**kwargs):
             return True
-        return isSupportTeam().has_permission(**kwargs) and kwargs["user"].id == obj.support_contact_id
+        return (
+            isSupportTeam().has_permission(**kwargs)
+            and kwargs["user"].id == obj.support_contact_id
+        )
