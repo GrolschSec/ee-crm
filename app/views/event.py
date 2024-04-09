@@ -30,8 +30,8 @@ class EventView(CRUDView):
         end_date: str,
         location: str,
         attendees_count: int,
-        notes: str,
         contract_id: int,
+        notes: str = None,
     ):
         return super().handle_create(
             start_date=start_date,
@@ -51,11 +51,13 @@ class EventView(CRUDView):
             echo(f"Error: {self.controller.retrieve_error()}")
             raise Exit(1)
 
-    def handle_list(self):
-        return super().handle_list()
+    def handle_list(self, show_not_assigned_only: bool = False):
+        return super().handle_list(show_not_assigned_only=show_not_assigned_only)
 
     def list(self, **kwargs):
         events = self.controller.list()
+        if kwargs.get("show_not_assigned_only"):
+            events = [event for event in events if event.support_contact_id is None]
         headers = [
             "ID",
             "Start Date",

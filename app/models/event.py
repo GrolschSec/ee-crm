@@ -12,7 +12,7 @@ class Event(Base):
     end_date: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     location: Mapped[str] = mapped_column(String(255))
     attendees_count: Mapped[int] = mapped_column()
-    notes: Mapped[str] = mapped_column(String(255))
+    notes: Mapped[str] = mapped_column(String(255), nullable=True)
     contract_id: Mapped[int] = mapped_column(ForeignKey("contracts.id"))
     support_contact_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"), nullable=True
