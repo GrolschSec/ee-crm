@@ -1,6 +1,10 @@
 from app.views.view import CRUDView
 from app.controllers.event import EventController
-from app.controllers.permission import isAuthenticated, isSalesReferentEvent, isSalesReferentEventOrManagementTeam
+from app.controllers.permission import (
+    isAuthenticated,
+    isSalesReferentEvent,
+    isSalesReferentEventOrManagementTeam,
+)
 from typer import echo, Exit
 from tabulate import tabulate
 
@@ -103,4 +107,3 @@ class EventView(CRUDView):
 
     def update(self, **kwargs):
         echo(self.controller.update(**kwargs))
-        
