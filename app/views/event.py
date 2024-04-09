@@ -3,7 +3,7 @@ from app.controllers.event import EventController
 from app.controllers.permission import (
     isAuthenticated,
     isSalesReferentEvent,
-    isSalesReferentEventOrManagementTeam,
+    isSupportReferentEventOrManagementTeam,
 )
 from typer import echo, Exit
 from tabulate import tabulate
@@ -15,7 +15,7 @@ class EventView(CRUDView):
     permission_classes = {
         "create": [isSalesReferentEvent],
         "list": [isAuthenticated],
-        "update": [isSalesReferentEventOrManagementTeam],
+        "update": [isSupportReferentEventOrManagementTeam],
     }
 
     def __init__(self) -> None:
