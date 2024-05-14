@@ -51,11 +51,13 @@ class EventView(CRUDView):
             echo(f"Error: {self.controller.retrieve_error()}")
             raise Exit(1)
 
-    def handle_list(self, show_not_assigned_only: bool = False):
-        return super().handle_list(show_not_assigned_only=show_not_assigned_only)
+    def handle_list(self, show_not_assigned_only: bool = False, show_only_my_events: bool = False):
+        return super().handle_list(show_not_assigned_only=show_not_assigned_only, show_only_my_events=show_only_my_events)
 
     def list(self, **kwargs):
         events = self.controller.list()
+        if kwargs.get("show_only_my_events"):
+            events = [event for event in events if event.support_contact_id == kwargs.get("user").id]
         if kwargs.get("show_not_assigned_only"):
             events = [event for event in events if event.support_contact_id is None]
         headers = [
@@ -95,6 +97,7 @@ class EventView(CRUDView):
         location: str = None,
         attendees_count: int = None,
         notes: str = None,
+        contract_id: int = None,
         support_contact_id: int = None,
     ):
         return super().handle_update(
@@ -104,6 +107,7 @@ class EventView(CRUDView):
             location=location,
             attendees_count=attendees_count,
             notes=notes,
+            contract_id=contract_id,
             support_contact_id=support_contact_id,
         )
 

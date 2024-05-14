@@ -39,11 +39,15 @@ class ContractView(CRUDView):
             echo(f"Error: {self.controller.retrieve_error()}")
             raise Exit(1)
 
-    def handle_list(self):
-        return super().handle_list()
+    def handle_list(self, not_signed: bool = False, not_paid: bool = False):
+        return super().handle_list(not_signed=not_signed, not_paid=not_paid)
 
     def list(self, **kwargs):
         contracts = self.controller.list()
+        if kwargs.get("not_signed"):
+            contracts = [contract for contract in contracts if not contract.is_signed]
+        if kwargs.get("not_paid"):
+            contracts = [contract for contract in contracts if contract.amount_due > 0]
         headers = [
             "ID",
             "Client Name",
@@ -73,9 +77,10 @@ class ContractView(CRUDView):
         amount_total: float = None,
         amount_due: float = None,
         is_signed: bool = None,
+        client_id: int = None,
     ):
         return super().handle_update(
-            pk=pk, amount_total=amount_total, amount_due=amount_due, is_signed=is_signed
+            pk=pk, amount_total=amount_total, amount_due=amount_due, is_signed=is_signed, client_id=client_id
         )
 
     def update(self, **kwargs):

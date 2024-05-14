@@ -108,10 +108,10 @@ class ModelController:
 
         self.session = obj.session
         self.validate(**kwargs)
-        if not self.is_valid:
+        if not self.is_valid():
             return self.retrieve_error()
         for field in self.fields:
-            if kwargs.get(field):
+            if kwargs.get(field) is not None:
                 setattr(obj, field, kwargs.get(field))
                 self.updated = True
         if self.updated:
