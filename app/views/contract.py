@@ -7,6 +7,7 @@ from app.controllers.permission import (
 from app.views.view import CRUDView
 from typer import echo, Exit
 from tabulate import tabulate
+from sentry_sdk import capture_message
 
 
 class ContractView(CRUDView):
@@ -84,6 +85,8 @@ class ContractView(CRUDView):
         )
 
     def update(self, **kwargs):
+        if kwargs.get("is_signed") and kwargs.get("is_signed") is True:
+            capture_message(f"Contract {kwargs['pk']} has been signed.")
         echo(self.controller.update(**kwargs))
 
     def handle_delete(self, pk: int):

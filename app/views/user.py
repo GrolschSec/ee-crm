@@ -2,6 +2,7 @@ from app.views.view import CRUDView
 from app.controllers.user import UserController
 from typer import echo, prompt, Exit, Option
 from tabulate import tabulate
+from sentry_sdk import capture_message
 from app.controllers.permission import (
     AllowAny,
     isAuthenticated,
@@ -70,6 +71,7 @@ class UserView(CRUDView):
                 self.controller.errors.pop("role")
         if self.controller.is_valid():
             self.controller.save()
+            capture_message(f"New collaborator created: {kwargs['fullname']}")
             echo("User created successfully.")
         else:
             echo(f"Error: {self.controller.retrieve_error()}")
@@ -100,6 +102,7 @@ class UserView(CRUDView):
         )
 
     def update(self, **kwargs):
+        capture_message(f"User updated with id {kwargs['pk']}")
         echo(self.controller.update(**kwargs))
 
     def handle_delete(self, pk: int, silent: bool = False):
