@@ -102,8 +102,8 @@ class UserView(CRUDView):
         )
 
     def update(self, **kwargs):
-        capture_message(f"User updated with id {kwargs['pk']}")
         echo(self.controller.update(**kwargs))
+        capture_message(f"User updated with id {kwargs['pk']}")
 
     def handle_delete(self, pk: int, silent: bool = False):
         super().handle_delete(pk=pk, silent=silent)

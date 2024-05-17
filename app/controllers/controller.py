@@ -99,6 +99,22 @@ class ModelController:
         result = self.model_class.all()
         self.session = result[1]
         return result[0]
+    
+    def db_validate(self, obj):
+        try:
+            with self.session.begin_nested():
+                self.session.flush()
+        except Exception as e:
+            error_info = e.orig.args[0] if e.orig.args else str(e)
+            msg = ""
+            if "unique constraint" in error_info:
+                field_name = error_info.split('"')[1].split("_")
+                field_value = error_info.split("=")[1].split(")")[0].replace("(", "")
+                msg = f"the {field_name[1]} '{field_value}' already exists in database."
+            else:
+                msg = f"Database: {error_info}"
+            self.errors["db"] = msg
+
 
     def update(self, **kwargs):
         self.updated = False
@@ -110,18 +126,27 @@ class ModelController:
 
         self.session = obj.session
         for field in self.fields:
-            if not hasattr(self.model_class, field) or not isinstance(getattr(self.model_class, field), InstrumentedAttribute):
+    
+            field_value = kwargs.get(field)
+            if field_value is None:
                 continue
-            nullable = inspect_sqlalchemy(self.model_class).columns[field].nullable
-            unique = inspect_sqlalchemy(self.model_class).columns[field].unique
-            if field != "id" and kwargs.get(field) is None and not nullable and not unique:
-                kwargs[field] = getattr(obj, field)
-            if kwargs.get(field) is not None and getattr(obj, field) != kwargs.get(field):
-                setattr(obj, field, kwargs.get(field))
+
+            method = getattr(self, f"validate_{field}") if f"validate_{field}" in self.validate_methods else None
+
+            if (method is None or method(field_value)) and getattr(obj, field) != kwargs.get(field):
+                try:
+                    setattr(obj, field, field_value)
+                except Exception as e:
+                    self.errors[field] = str(e)
+                    break
                 self.updated = True
-        self.validate(**kwargs)
-        if not self.is_valid():
+            
+        self.db_validate(obj)
+
+        self.is_valid = not bool(self.errors)
+        if not self.is_valid:
             return self.retrieve_error()
+        
         if self.updated:
             obj.save()
             return f"{type(obj).__name__} updated successfully."
