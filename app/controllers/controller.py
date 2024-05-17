@@ -1,4 +1,6 @@
 import inspect
+from sqlalchemy import inspect as inspect_sqlalchemy
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 
 class ModelController:
@@ -107,13 +109,19 @@ class ModelController:
             return "No object available for update."
 
         self.session = obj.session
+        for field in self.fields:
+            if not hasattr(self.model_class, field) or not isinstance(getattr(self.model_class, field), InstrumentedAttribute):
+                continue
+            nullable = inspect_sqlalchemy(self.model_class).columns[field].nullable
+            unique = inspect_sqlalchemy(self.model_class).columns[field].unique
+            if field != "id" and kwargs.get(field) is None and not nullable and not unique:
+                kwargs[field] = getattr(obj, field)
+            if kwargs.get(field) is not None and getattr(obj, field) != kwargs.get(field):
+                setattr(obj, field, kwargs.get(field))
+                self.updated = True
         self.validate(**kwargs)
         if not self.is_valid():
             return self.retrieve_error()
-        for field in self.fields:
-            if kwargs.get(field) is not None:
-                setattr(obj, field, kwargs.get(field))
-                self.updated = True
         if self.updated:
             obj.save()
             return f"{type(obj).__name__} updated successfully."
