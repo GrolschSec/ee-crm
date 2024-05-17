@@ -1,19 +1,21 @@
-# ee-crm
+Here's an improved version of the second part of your README, with better formatting, added explanations, and a more structured flow:
 
 ---
 
+# ee-crm
+
 ## Installation
 
-### Cloning the repository
+### Cloning the Repository
 
-1. Clone the repo:
-   ```bash
-   git clone https://github.com/GrolschSec/ee-crm.git
-   ```
-2. Move into the repository:
-   ```bash
-   cd ee-crm/
-   ```
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/GrolschSec/ee-crm.git
+    ```
+2. Move into the repository directory:
+    ```bash
+    cd ee-crm/
+    ```
 
 ### Setting up the Database
 
@@ -86,16 +88,24 @@
 ### Install Python Dependencies
 
 1. Create a virtual environment:
-   ```bash
-   python3 -m venv env
-   ```
-2. Load the environment (MacOS/Linux):
-   ```bash
-   source env/bin/activate
+    ```bash
+    python3 -m venv env
+    ```
+
+2. Activate the virtual environment:
+    - On MacOS/Linux:
+        ```bash
+        source env/bin/activate
+        ```
+    - On Windows:
+        ```bash
+        .\env\Scripts\activate
+        ```
+
 3. Install the program dependencies using pip:
-   ```bash
-   pip install -r requirements.txt
-   ```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 ### Apply Model Migrations to the Database
 
@@ -108,19 +118,20 @@ Once you have set the correct values in your `.env` file, follow these steps to 
 
 ---
 
-# Begin with the program 
+## Starting the Program
 
-at first there won't be any user in your database but so you need to be connected to an admin account or a account from the management team to create users in the crm.
-Since the db is empty you can create a superuser with the following command:
+Initially, there won't be any users in your database. You need to be connected to an admin account or an account from the management team to create users in the CRM. Since the database is empty, you can create a superuser with the following command:
 
+```bash
 python3 main.py user create --admin
+```
 
-E.g.: this command will only work if there is no admin in db (which should be the case).
+**Note:** This command will only work if there is no admin in the database, which should be the case initially.
 
-You can now login with the new superuser and enjoy the crm add users ...
+You can now log in with the new superuser and start using the CRM to add users and manage other functionalities.
 
-# Some about the permissions
-
-If you get a permission denied during ...blabla explain the permissions
-
-# Everything should work fine but you can test the code with the pytest included .....
+You can see the list of the commands using:
+```bash
+python3 main.py --help
+```
+---
