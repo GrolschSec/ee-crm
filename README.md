@@ -1,8 +1,19 @@
-Here's an improved version of the second part of your README, with better formatting, added explanations, and a more structured flow:
+# ee-crm
 
 ---
+## Introduction
 
-# ee-crm
+**ee-crm** is a Customer Relationship Management (CRM) software developed for Epic Events, a company specializing in organizing events such as parties, professional meetings, and outdoor activities. The purpose of this application is to streamline the management of client data and events, facilitating communication and coordination between different departments within the company.
+
+### Key Features
+
+- **Client Management**: Store and update client information, including contact details and company affiliation.
+- **Contract Management**: Create and manage contracts associated with clients, including tracking contract status and payment details.
+- **Event Management**: Schedule and manage events, assign support staff, and track event-specific details.
+- **User Roles**: Different user roles (commercial, support, management) with specific permissions to ensure data integrity and security.
+- **Security**: SQL injection prevention, principle of least privilege, and effective logging using Sentry.
+
+---
 
 ## Installation
 
