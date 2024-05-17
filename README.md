@@ -1,5 +1,3 @@
-Here's an improved version of your GitHub README, adding more clarity, proper formatting, and some additional explanations:
-
 ---
 
 # ee-crm
