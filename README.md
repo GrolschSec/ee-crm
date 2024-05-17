@@ -1,30 +1,89 @@
+Here's an improved version of your GitHub README, adding more clarity, proper formatting, and some additional explanations:
+
+---
+
 # ee-crm
 
-## Generate JWT Secret
+## Installation
 
-openssl rand -base64 32
+### Setting up the Database
 
+1. Install PostgreSQL:
+    ```bash
+    sudo apt install postgresql
+    ```
 
-# Setup the db
+2. Switch to the PostgreSQL user:
+    ```bash
+    sudo -i -u postgres
+    ```
 
-apt install postgresql
+3. Create the database:
+    ```sql
+    CREATE DATABASE ee_db;
+    ```
 
-sudo -i -u postgres
+4. Create a user and set a password:
+    ```sql
+    CREATE USER epicevents WITH PASSWORD 'password';
+    ```
 
-CREATE DATABASE ee_db;
+5. Grant privileges to the user on the database:
+    ```sql
+    GRANT ALL PRIVILEGES ON DATABASE ee_db TO epicevents;
+    ```
 
-CREATE USER epicevents WITH PASSWORD 'password';
+6. Exit the PostgreSQL prompt:
+    ```sql
+    \q
+    ```
 
-GRANT ALL PRIVILEGES ON DATABASE ee_db TO epicevents;
+### Configure Environment Variables
 
-\q
+1. Add a `.env` file at the root of the repository with the following content:
 
-# Migrate the database using alembic
+    ```env
+    DB_ENGINE=
+    DB_HOST=
+    DB_PORT=
+    DB_NAME=
+    DB_USER=
+    DB_PASSWORD=
 
-Once you'll have setted the good value in your .env file you can follow these steps
+    # JWT settings
+    JWT_SECRET=
+    JWT_ALGORITHM="HS256"
+    JWT_TOKEN_LIFETIME="1"
 
-alembic upgrade head
+    # Timezone settings
+    TZ="Europe/Paris"
 
+    # Phone settings
+    PHONE_REGION="FR"
+
+    # Sentry
+    SENTRY_DSN=
+    ```
+
+2. Fill in the database variables with your database information.
+
+3. Generate the JWT Secret using:
+    ```bash
+    openssl rand -base64 32
+    ```
+
+4. For Sentry, create an account at [Sentry](https://sentry.io/), create a project, and copy the Sentry DSN into the `.env` file.
+
+### Apply Model Migrations to the Database
+
+Once you have set the correct values in your `.env` file, follow these steps to apply model migrations:
+
+1. Upgrade the database schema:
+    ```bash
+    alembic upgrade head
+    ```
+
+---
 
 # Begin with the program 
 
