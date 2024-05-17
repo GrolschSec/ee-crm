@@ -72,6 +72,20 @@
 
 4. For Sentry, create an account at [Sentry](https://sentry.io/), create a project, and copy the Sentry DSN into the `.env` file.
 
+### Install Python Dependencies
+
+1. Create a virtual environment:
+   ```bash
+   python3 -m venv env
+   ```
+2. Load the environment (MacOS/Linux):
+   ```bash
+   source env/bin/activate
+3. Install the program dependencies using pip:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
 ### Apply Model Migrations to the Database
 
 Once you have set the correct values in your `.env` file, follow these steps to apply model migrations:
