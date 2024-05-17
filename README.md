@@ -1,6 +1,5 @@
 # ee-crm
 
----
 ## Introduction
 
 **ee-crm** is a Customer Relationship Management (CRM) software developed for Epic Events, a company specializing in organizing events such as parties, professional meetings, and outdoor activities. The purpose of this application is to streamline the management of client data and events, facilitating communication and coordination between different departments within the company.
@@ -141,8 +140,9 @@ python3 main.py user create --admin
 
 You can now log in with the new superuser and start using the CRM to add users and manage other functionalities.
 
-You can see the list of the commands using:
+You can see the list of commands using:
 ```bash
 python3 main.py --help
 ```
+
 ---
